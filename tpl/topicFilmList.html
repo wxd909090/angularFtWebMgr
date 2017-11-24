@@ -1,0 +1,41 @@
+<div class="navTitle">位置: <a ui-sref="app.filmMgr">电影管理</a> > <a ui-sref="app.topic">专题管理</a> > 专题电影</div>
+<!-- 电影列表 -->
+<div class="filmMgrListWrap text-center">
+	<div class="filmMgrListHeader">
+		<div class="pull-left flex-1 filmMgrListHeader-first">序号</div>
+		<div class="pull-left flex-2">海报</div>
+		<div class="pull-left flex-2">电影名称</div>
+		<div class="pull-left flex-8 text-left text-indent-20">电影详情</div>
+		<div class="pull-left flex-3">操作</div>
+	</div>
+	<div class="filmMgrListBody">
+		<div class="filmInfo" ng-repeat="film in filmListData">
+			<div class="filmSort flex-1">{{$index + 1}}</div>
+			<div class="filmImg flex-2">
+				<img src="{{film.image}}" alt="">
+			</div>
+			<div class="filmName flex-2">{{film.film_name}}</div>
+			<div class="filmDes flex-8">
+				<div class="flex-1">
+					<p><span>导演</span>：{{film.director}}</p>
+					<p><span>类型</span>：{{film.class_describe}}</p>
+					<p><span>上映时间</span>：{{film.screen_time | turnDateYMD}}</p>
+				</div>
+				<div class="flex-1">
+					<p><span>点播次数(当月/上月)</span>: {{film.count}} | {{film.last_count}}</p>
+					<p><span>评分</span>: {{film.grade}}</p>
+					<p><span>时长</span>：{{film.time_length}}分钟</p>
+				</div>
+				<div class="flex-1">
+					<p><span>添加时间</span>：{{film.add_time | turnDateYMD}}</p>
+					<p><span>是否推荐</span>：{{film.is_recommend}}</p>
+				</div>
+			</div>
+			<div class="filmOptions flex-3">
+				<div class="flex-1 l-h-100">
+					<button class="btn btn-default" ng-click="delFilm(film,$index)">移除专题</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

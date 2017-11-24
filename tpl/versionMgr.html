@@ -1,0 +1,157 @@
+<div class="pt_36  text-center font16" style="margin-top:20px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn text-left">
+        <form class="form-inline m-l-20">
+            <div class="form-group">
+                <p class="form-control-static">使用状态：</p>
+                <select class="form-control text-left" ng-model="enable">
+                    <option value="" ng-selected="true">全部</option>
+                    <option value="2">启用中</option>
+                    <option value="1">禁用中</option>
+                </select>
+            </div>
+            <div class="form-group m-l-20">
+                <p class="form-control-static">程序名称：</p>
+                <input type="text" class="form-control" id="" ng-model="app_name" placeholder="请输入程序名称">
+            </div>
+            <div class="form-group m-l-20">
+                <p class="form-control-static">程序id：</p>
+                <input type="text" class="form-control" id="" ng-model="app_id" placeholder="请输入程序id">
+            </div>
+            <div class="form-group">
+                <p class="form-control-static">创建日期：</p>
+                <p style="width: 260px;margin: 0" class="input-group pull-right">
+                    <input type="text" class="form-control" uib-datepicker-popup ng-model="create_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+            <button type="button" class="btn btn-primary m-l-20" ng-click="searchBtn()">搜索</button>
+            <button type="button" class="btn btn-primary m-l-20" ng-click="emptySearch()">清空</button>
+        </form>
+        <table class="table table-responsive table-bordered table-hover m-t-md" style="margin-bottom: 5px">
+        	<thead>
+        		<tr>
+        			<th ng-cloak class="text-center" style="width:50px">
+        				<label class="checkbox-inline i-checks">
+			              	<input type="checkbox" ng-model="option1" ng-click="checkAllChoose()"><i></i>
+			            </label>
+        			</th>
+        			<th ng-cloak class="text-center" style="width:80px">序号</th>
+        			<th ng-cloak class="text-center">程序名称</th>
+                    <th ng-cloak class="text-center">程序id</th>
+        			<th ng-cloak class="text-center">启用时间</th>
+                    <th ng-cloak class="text-center">修改时间</th>
+        			<th ng-cloak class="text-center">状态</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr ng-repeat="app in appList">
+        			<td ng-cloak class="text-center">
+        				<label class="checkbox-inline i-checks">
+			              	<input type="checkbox" ng-model="app.checked"><i></i>
+			            </label>
+			        </td>
+                    <td ng-cloak class="text-center">{{app.id}}</td>
+        			<td ng-cloak class="text-center">
+                        <a class="cur-pointer" ng-click="updateApp(app)">{{app.app_name}}</a>
+                    </td>
+                    <td ng-cloak class="text-center">{{app.app_id}}</td>
+                    <td ng-cloak class="text-center">{{app.create_time | turnDateHMS}}</td>
+                    <td ng-cloak class="text-center">{{app.update_time | turnDateHMS}}</td>
+                    <td ng-clock class="text-center normalStaff" ng-show="app.enable == 2">{{ app.enable | appStatus}}</td>
+                    <td ng-clock class="text-center formalStaff" ng-show="app.enable == 1">{{ app.enable | appStatus}}</td>
+        		</tr>
+        	</tbody>
+        	<tfoot></tfoot>
+        </table>
+        <div class="group-buy-btns m-l-20 tableBottomBtns">
+    		<button class="btn btn-primary" ng-click="createApp()">添加</button>
+            <button class="btn btn-primary" ng-click="enableApp()">启用</button>
+            <button class="btn btn-danger" ng-click="disableApp()">禁用</button>
+            <button class="btn btn-danger" ng-click="delApp()">删除</button>
+    	</div>
+        <div style="position: relative;overflow: hidden;">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>
+	</div>
+    <!--添加App模态框模板-->
+    <div>
+        <script type="text/ng-template" id="createApp.html">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">添加App</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline m-l-20">
+                    <div class="form-group block">
+                        <p class="form-control-static">App_ID ：</p>
+                        <input type="text" class="form-control" id="" ng-model="appId" placeholder="请输入App_id">
+                    </div>
+                    <div class="form-group block m-t-md">
+                        <p class="form-control-static">App名字：</p>
+                        <input type="text" class="form-control" id="" ng-model="appName" placeholder="请输入App名字">
+                    </div>
+                    <div class="form-group block m-t-md">
+                        <p class="form-control-static">App状态：</p>
+                        <div class="checkbox m-l-20">
+                            <label class="i-checks w-60">
+                                <input type="radio" checked="checked" name="confirmOrder" ng-model="enable" ng-value="2"><i></i>启用
+                            </label>
+                            <label class="i-checks w-60">
+                                <input type="radio" name="confirmOrder" ng-model="enable" ng-value="1"><i></i>禁用
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" ng-click="close()">取消</button>
+                <button class="btn btn-primary" ng-click="createAppSub()">生成</button>
+            </div>
+        </script>
+    </div>
+    <!--编辑App模态框模板-->
+    <div>
+        <script type="text/ng-template" id="updateApp.html">
+            <div class="modal-header">
+                <h4 class="modal-title text-center">编辑App</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline m-l-20">
+                    <div class="form-group block">
+                        <p class="form-control-static">App名称：</p>
+                        <input type="text" class="form-control" id="" ng-model="appInfo.app_name" placeholder="请输入App名称">
+                    </div>
+                    <div class="form-group block m-t-md">
+                        <p class="form-control-static">App_ID ：</p>
+                        <input type="text" class="form-control" id="" ng-model="appInfo.app_id" placeholder="请输入App_ID">
+                    </div>
+                    <div class="form-group block m-t-md">
+                        <p class="form-control-static">App状态：</p>
+                        <div class="checkbox m-l-20">
+                            <label class="i-checks w-60">
+                                <input type="radio" name="confirmOrder" ng-model="appInfo.enable" ng-value="2"><i></i>启用
+                            </label>
+                            <label class="i-checks w-60">
+                                <input type="radio" name="confirmOrder" ng-model="appInfo.enable" ng-value="1"><i></i>禁用
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" ng-click="close()">取消</button>
+                <button class="btn btn-primary" ng-click="updateAppSub()">生成</button>
+            </div>
+        </script>
+    </div>
+</div>		
+
+
+

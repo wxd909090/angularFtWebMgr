@@ -1,0 +1,29 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 --> 
+<div class="pt_36 text-center font16">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn">
+		<div style="margin-top: 40px;" class="col-sm-11">
+
+			<!-- 用户分析 -->
+			<form class="form-horizontal" role="form">
+			 	<div class="form-group">
+				 	<div class="col-sm-3 col-md-2">
+				 		<select class="form-control" ng-change="changeSel(formDataType)" ng-model="formDataType">
+							<option>新增人数</option>
+							<option>使用人数</option>
+							<option>登录人数</option>
+						</select>
+				 	</div>
+
+				 	<label for="inputPassword3" class="col-sm-2 col-md-1 control-label storeStreamLabelChoose">选择日期:</label>
+				 	<div class="col-sm-3 col-md-2">
+				 		<input type="daterange" class="form-control dateInput" ng-model="dateDay" ranges="rangesDate" id="dateDay">
+				 	</div>
+
+			 	</div>
+			</form>
+			<hr>
+			<!-- <ng-echarts class="col-md-12 echarts" ec-config="lineConfig" ec-option="optionUserAnalysis" ></ng-echarts> -->
+		</div>
+	</div>
+</div>

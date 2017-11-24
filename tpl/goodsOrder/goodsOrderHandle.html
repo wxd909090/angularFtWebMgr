@@ -1,0 +1,130 @@
+<div class="goodsOrderHandleWrap">
+	<div class="my-page-header clear">
+		<div class="pull-left">选择门店</div>
+		<div class="pull-left m-l">
+			<select ng-model="store" class="form-control w-200 inline" ng-options="store.store_name for store in storeListData" ng-change="changeStore()"></select>
+		</div>
+	</div>
+	<div class="m-t-md p-40-o">
+		<button ng-class="{'btn btn-primary':!showGoodsSend,'btn btn-default':showGoodsSend}" ng-click="changeStatus(0)">待配送 <sup>{{distributionNum}}</sup></button>
+		<button ng-class="{'btn btn-primary':!showChargeback,'btn btn-default':showChargeback}" ng-click="changeStatus(1)">申请退单 <sup>{{refunsReqtNum}}</sup></button>
+		<button ng-class="{'btn btn-primary':!showTodayOrders,'btn btn-default':showTodayOrders}" ng-click="changeStatus(2)">今日完成 <sup>{{completeNum}}</sup></button>
+	</div>
+	<div class="m-t-md m-l-xl">
+		<form class="form-inline">
+		  	<div class="form-group" ng-show="showGoodsSend">
+		 		<p style="width: 260px;margin: 0;" class="input-group pull-right">
+          			<input type="text" class="form-control" uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="" ng-change="checkDateChange(checkDate)"/>
+		          	<span class="input-group-btn">
+		            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+		          	</span>
+				</p>
+		 	</div>
+		 	<div class="form-group">
+				<div class="input-group">
+					<input type="text" ng-model="mobile" ng-change='serachUser()' class="form-control input-sm bg-light no-border rounded padder" placeholder="搜索手机号">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-sm bg-light rounded" ng-click="serachOrder()"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="goodsOrderTableBox m-t-md p-40-o">
+		<table class="table table-responsive table-bordered table-hover" style="margin:0 auto">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center">订单号</th>
+		            <th ng-cloak class="text-center">用户</th>
+		            <th ng-cloak class="text-center">包间/时段</th>
+		            <th ng-cloak class="text-center">支付</th>
+		            <th ng-cloak class="text-center">支付时间</th>
+		            <th ng-cloak class="text-center">配送方式</th>
+		            <th ng-cloak class="text-center">商品</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    	<tr ng-repeat="goodsOrder in goodsOrderData">
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.go_sn}}</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.info.mobile}}</td>
+	    			<td ng-clock class="text-center">
+	    				<p>{{goodsOrder.ft_order.info.room_name}}</p>
+	    				<p>{{goodsOrder.ft_order.info.duration_time}}</p>
+	    				<p>{{goodsOrder.ft_order.reserve_time | turnDateYMD}}</p>
+	    			</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.pay_type | goodsPayType}}￥{{goodsOrder.price}} 
+	    				优惠￥{{goodsOrder.ft_order.free_price}}
+	    			</td>
+	    			<td ng-clock class="text-center">
+	    				<span ng-repeat="payRecode in goodsOrder.pay_record">
+							<span ng-if="payRecode.status == 2">
+								{{payRecode.pay_time | turnYMDHMS}}
+							</span>	    					
+	    				</span>
+	    			</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.distribution_type | distributionMethod}}</td>
+		    		<td ng-clock class="text-center clearPadding">
+						<a class="btn btn-text" ng-click="checkGoodsOrder(goodsOrder)">查看</a>
+		    		</td>
+		    	</tr>
+		    </tbody>
+		</table>
+		<!-- 分页设置 -->
+		<div style="position: relative;overflow: hidden">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left" style="margin-top: 23px;margin-left: 20px">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>
+	</div>
+</div>
+<!--商品订单查看模态框模板-->
+<div>
+    <script type="text/ng-template" id="checkGoodsOrder.html">
+    	<div class="modal-header">
+	        <h4 class="modal-title text-center">{{goodsOrder.ft_order.info.store_name}}
+				<button type="button" class="close" ng-click="close()">
+			 		<span aria-hidden="true">&times;</span>
+			 		<span class="sr-only">Close</span>
+				</button>
+	        </h4>
+	    </div>
+        <div class="modal-body goodsOrderInfoWrap">
+			<p>订单用户：<span>{{goodsOrder.ft_order.info.mobile}}</span></p>
+			<p>配送包间：<span>{{goodsOrder.ft_order.info.room_name}}</span></p>
+			<p>配送时段：<span>{{goodsOrder.ft_order.reserve_time | turnDateYMD}} {{goodsOrder.ft_order.info.duration_time}}</span></p>
+			<p>配送方式：<span>{{goodsOrder.ft_order.distribution_type | distributionMethod}}</span></p>
+			<table class="table table-responsive table-bordered table-hover">
+				<thead>
+			        <tr>
+			            <th ng-cloak class="text-center">商品名称</th>
+			            <th ng-cloak class="text-center">数量</th>
+			            <th ng-cloak class="text-center">单价</th>
+			        </tr>
+			    </thead>
+				<tbody>
+					<tr ng-repeat="orderGoods in goodsOrder.order_goods">
+						<td ng-cloak class="text-center">{{orderGoods.name}}</td>
+						<td ng-cloak class="text-center">{{orderGoods.total_amount}}</td>
+						<td ng-cloak class="text-center">￥{{orderGoods.price}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<p class="goodsOrderPirceText">
+				<span>订单金额：￥{{goodsOrder.totalAllGoodsPrice}}</span>
+				<span class="m-sm"> 优惠￥{{((goodsOrder.totalAllGoodsPrice)*1000 - (goodsOrder.price)*1000)/1000}}</span>
+				<span class="m-sm"> 实付￥{{goodsOrder.price}}({{goodsOrder.ft_order.pay_type | goodsPayType}})</span>
+			</p>
+        </div>
+        <div class="modal-footer">  
+            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="refundOrder()" ng-show="showGoodsSend">退单并退款</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sendGoods()" ng-show="showGoodsSend">配送</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sureRefoundOrder(1)" ng-show="showChargeback">拒绝(配送)</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sureRefoundOrder(2)" ng-show="showChargeback">拒绝(不配送)</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sureRefoundOrder(3)" ng-show="showChargeback">同意并退款</button>
+            <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="refundOrder()" ng-show="showTodayOrders">退单并退款</button> -->
+        </div> 
+    </script>
+</div>

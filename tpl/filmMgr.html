@@ -1,0 +1,563 @@
+<div class="pt_36  text-center font16" style="margin-top:10px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable">
+		<!-- 筛选条件 -->
+		<form class="navbar-form navbar-form-sm navbar-left shift clear text-left w-full filmMgrChooseForm boder-t p-10" ui-shift="prependTo" target=".navbar-collapse" role="search">
+			<div class="form-group m-l-20">
+				<select class="form-control" ng-model="store_sn" ng-change="getFilmlistByStoreSn()">
+					<option value="">电影库</option>
+					<option ng-repeat="x in storeListData" value="{{x.store_sn}}">{{x.store_name}}</option>
+				</select>
+			</div>
+			<div class="input-group">
+				<select class="form-control" ng-model="isHasImage"  ng-change="changeisShow()">
+					<option ng-repeat="x in isHasImageData" value="{{x.value}}" ng-selected="isHasImage == x.value">{{x.name}}</option>
+				</select>
+			</div>
+			<!-- <div class="form-group m-l-xs">
+				时间:
+				<input type="number" class="form-control" name="points" min="0" max="40000" ng-model="begin_time" ng-blur="changeYears()"/>
+				-
+				<input type="number" class="form-control" name="points" min="0" max="40000" ng-model="end_time" ng-blur="changeYears()"/>
+			</div> -->
+			<div class="form-group">
+				<div class="input-group">
+					<input type="text" ng-model="keyWord" ng-change='searchGetFilm()' class="form-control input-sm bg-light no-border rounded padder" style="width: 215px" placeholder="搜索电影、导演、上映年份、评分">
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-sm bg-light rounded" ng-click="serachMovie()"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<button class="btn btn-success m-l-20" ng-click="addFilm()">添加电影</button>
+			</div>
+		</form>
+		<!-- 排行榜选择 -->
+		<div class="clear clear-both text-left w-full boder-t">
+			<form class="navbar-form navbar-form-sm navbar-left shift p-10" ui-shift="prependTo" target=".navbar-collapse" role="search">
+				<div class="form-group m-l-20" ng-repeat="filmBillboard in filmBillboards">
+					<button ng-class="{'btn':true,'btn-success':filmBillboard.choose,'btn-default':!filmBillboard.choose}" ng-click="changeBillboard(filmBillboard,$index)" ng-disabled="filmBillboard.disabled">{{filmBillboard.name}}</button>
+				</div>
+			</form>
+		</div>
+		<!-- 电影年份以及分类 -->
+		<form class="navbar-form navbar-form-sm navbar-left shift p-10 w-full boder-t text-left" ui-shift="prependTo" target=".navbar-collapse" role="search">
+			<div>
+				<div class="form-group m-l-20">
+					<div>电影分类：</div>
+				</div>
+				<div class="form-group" ng-repeat="filmType in filmTypes">
+					<button ng-class="{'btn':true,'m-l-xs':true,'btn-success':filmType.choose,'btn-default':!filmType.choose}" ng-click="changeFilmType(filmType,$index)" ng-disabled="filmType.disabled">{{filmType.name}}</button>
+				</div>
+			</div>
+			<div class="m-t">
+				<div class="form-group m-l-20">
+					<div>电影年份：</div>
+				</div>
+				<div class="form-group" ng-repeat="filmYear in filmYears">
+					<button ng-class="{'btn':true,'m-l-xs':true,'btn-success':filmYear.choose,'btn-default':!filmYear.choose}" ng-click="chooseYears(filmYear,$index)" ng-disabled="filmYear.disabled">{{filmYear.name}}</button>
+				</div>
+			</div>
+		</form>
+
+		<!-- 电影列表 -->
+		<div class="filmMgrListWrap">
+			<div class="filmMgrListHeader">
+				<div class="pull-left flex-1 filmMgrListHeader-first">序号</div>
+				<div class="pull-left flex-2">海报</div>
+				<div class="pull-left flex-2">电影名称</div>
+				<div class="pull-left flex-8 text-left text-indent-20">电影详情</div>
+				<div class="pull-left flex-3">操作</div>
+			</div>
+			<div class="filmMgrListBody">
+				<div class="filmInfo" ng-repeat="film in filmListData">
+					<div class="filmSort flex-1">{{$index + 1}}</div>
+					<div class="filmImg flex-2">
+						<img src="{{film.image}}" alt="">
+					</div>
+					<div class="filmName flex-2">
+						<a ng-click="getCelebrityList(film)" class="cur-pointer">{{film.film_name}}</a>
+					</div>
+					<div class="filmDes flex-8">
+						<div class="flex-1">
+							<p><span>导演</span>：{{film.director}}</p>
+							<p><span>类型</span>：{{film.class_describe}}</p>
+							<p><span>上映时间</span>：{{film.screen_time | turnDateYMD}}</p>
+						</div>
+						<div class="flex-1">
+							<p><span>点播次数(当月/总播放)</span>: {{film.count}} | {{film.last_count}}</p>
+							<p><span>评分</span>: {{film.grade}}</p>
+							<p><span>时长</span>：{{film.time_length}}分钟</p>
+						</div>
+						<div class="flex-1">
+							<p><span>添加时间</span>：{{film.add_time | turnDateYMD}}</p>
+							<!-- <p><span>修改时间</span>：2017-9-6</p> -->
+							<p><span>是否推荐</span>：{{film.is_recommend | turnText}}</p>
+						</div>
+					</div>
+					<div class="filmOptions flex-3">
+						<div class="flex-1">
+							<button class="btn btn-default" ng-click="toFilmReviewsMgr(film)">评论管理</button>
+							<button class="btn btn-default" ng-click="delFilm(film,$index)">删除电影</button>
+						</div>
+						<div class="flex-1">
+							<button class="btn btn-default" ng-click="removeTopic(film)">移入专题</button>
+							<button class="btn btn-default" ng-click="editFilm(film,$index)">编辑电影</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 分页设置 -->
+		<div style="position: relative;overflow: hidden" ng-show="showPagination">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>
+	</div>
+
+
+	<!--编辑电影模态框模板-->
+    <div>
+        <script type="text/ng-template" id="filmEdit.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">编辑电影
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" name="filmEditorForm" verify-scope>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">电影名字:</label>
+					    <div class="col-sm-6">
+					    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="editFilmData.film_name" placeholder="输入电影名字">
+					    </div>
+						<div class="col-sm-2 text-right">
+							<button class="btn btn-primary" ng-click="getDoubanFilm()">查询</button>
+						</div>
+				  	</div>
+					<div class="form-group">
+						<table class="table table-bordered table-hover" style="width:77%;margin-left: 12%;margin-bottom: 0" ng-show="filmChooseList.length > 0">
+							<thead>
+							<tr>
+								<th class="text-center">名称</th>
+								<th class="text-center">导演</th>
+								<th class="text-center">时间</th>
+								<th class="text-center">操作</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr ng-repeat="film in filmChooseList">
+								<td class="text-center">
+									<a ng-href="{{film.alt}}" target="_blank">{{film.title}}</a>
+								</td>
+								<td class="text-center">{{film.directors[0].name}}</td>
+								<td class="text-center">{{film.year}}</td>
+								<td class="text-center clearPadding"><button class="btn btn-primary  small" ng-click="chooseDoubanResult(film)">选择</button></td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				  	<!--<div class="form-group">-->
+				    	<!--<label class="col-sm-3 control-label">电影拼音:</label>-->
+					    <!--<div class="col-sm-8">-->
+					      	<!--<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="editFilmData.spell" placeholder="输入电影拼音">-->
+					    <!--</div>-->
+				  	<!--</div>-->
+					<div class="form-group">
+						<label class="col-sm-3 control-label">电影hash:</label>
+						<div class="col-sm-8">
+							<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="editFilmData.name_hash" placeholder="输入电影hash">
+						</div>
+					</div>
+				  	<div class="form-group">
+				  		<label class="col-sm-3 control-label">电影推荐:</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+								<label class="i-checks">
+									<input type="radio" ng-checked="editFilmData.is_recommend == 1" name="is_recommend" ng-model="editFilmData.is_recommend" ng-value="1"><i></i>推荐
+								</label>
+								<label class="i-checks m-l-20">
+									<input type="radio" ng-checked="editFilmData.is_recommend == 0" name="is_recommend" ng-model="editFilmData.is_recommend " ng-value="0"><i></i>不推荐
+								</label>
+							</div>
+					    </div>
+				  	</div>
+				  	<div class="form-group" ng-show="filmTypeFlag">
+				  		<label class="col-sm-3 control-label">电影展示:</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+					      		<label class="i-checks">
+									<input type="radio" ng-checked="editFilmData.type == 0" name="type" ng-model="editFilmData.type" ng-value="0"><i></i>上架中
+								</label>
+								<label class="i-checks" style="margin-left: 10px">
+									<input type="radio" ng-checked="editFilmData.type == 2" name="type" ng-model="editFilmData.type" ng-value="2"><i></i>系统下架 
+								</label>
+								<label class="i-checks" style="margin-left: 10px">
+									<input type="radio" ng-checked="editFilmData.type == 3" name="type" ng-model="editFilmData.type " ng-value="3"><i></i>商家下架 
+								</label>
+							</div>
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">电影时长:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="pattern:/^1[1-9]$|^[2-9]\d$|^1\d{2}$|^2\d{2}$/,errmsg:'请输入10到300的整数！'" class="form-control" ng-model="editFilmData.time_length" placeholder="输入电影时长">
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">上映时间:</label>
+					    <div class="col-sm-8">
+					      	<!--<input type="input" ng-verify="pattern:/^19\d{2}$|^20\d{2}$/,errmsg:'请输入1900到2100的整数！'" class="form-control" ng-model="editFilmData.screen_time" placeholder="输入上映时间">-->
+								<input type="text" style="width: 35%;text-align: center;float: left;" class="form-control" readonly uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" />
+	            				<button type="button" style="float: left;margin-left: 10px;" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+						</div>
+				  	</div>
+				  	<div class="form-group">
+						<label class="col-sm-3 control-label">电影信息:</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="editFilmData.info" placeholder="输入电影信息"></textarea> 
+						</div>
+			  		</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">导演:</label>
+					    <div class="col-sm-8">
+					    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="editFilmData.director" placeholder="输入导演名字">
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">主演:</label>
+					    <div class="col-sm-8">
+					    	<!-- <input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="editFilmData.protagonist" placeholder="输入导演名字"> -->
+					    	<div class="row" style="margin:0">
+					    		<div class="col-xs-9" style="padding:0">
+								    <input type="input" class="form-control" ng-model="actor" placeholder="输入主角名字">
+					    		</div>
+								<div class="col-xs-2" style="padding:0;margin-left: 10px">
+									<button class="btn btn-primary small" ng-click="addActor()">添加主演</button>
+								</div>
+					    	</div>
+					      	<div class="row" style="margin:10px 0 0 0">
+					      		<ul class="list-group text-center administrorUl">
+					      			<li class="list-group-item text-left" ng-repeat="actor in actorsArr">
+					      				{{ $index + 1 }} . {{actor}} 
+					      				<button class="btn btn-danger btn-circle m-l pull-right" style="margin-top:-7px" ng-click="delActor($index)">删除</button>
+					      			</li>
+								</ul>
+					      	</div>
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">评分:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="pattern:/^([0-9].\d+$|[0-9]|(10.0)|(10))$/,errmsg:'请输入0到10的数字！'" class="form-control" ng-model="editFilmData.grade" placeholder="评分">
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">序号:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="pattern:/^0$|^[1-9]\d*$/,errmsg:'请输入正确的数字！'" class="form-control" ng-model="editFilmData.sort" placeholder="输入序号">
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">类型:</label>
+					    <div class="col-sm-8">
+					    	<input type="input" ng-verify="min:1, max:12,errmsg:'不超过12字符!'" class="form-control" ng-model="editFilmData.class_describe" placeholder="输入电影类型">
+					    	<!-- <div class="row" style="margin:0">
+					    		<div class="col-xs-9" style="padding:0">
+								    <input type="input" class="form-control" ng-model="filmType" placeholder="输入电影类型">
+					    		</div>
+								<div class="col-xs-2" style="padding:0;margin-left: 10px">
+									<button class="btn btn-primary small" ng-click="addFilmType()">添加类型</button>
+								</div>
+					    	</div>
+					      	<div class="row" style="margin:10px 0 0 0">
+					      		<ul class="list-group text-center administrorUl">
+					      			<li class="list-group-item text-left pull-left" style="width:45%;margin-right:5%;margin-bottom: 5px;font-size: 14px;overflow: hidden;" ng-repeat="filmType in filmTypeArr">
+					      				{{ $index + 1 }} . {{filmType}} <span class="pull-right" ng-click="delFilmType($index)" style="cursor: pointer;">X</span>
+					      			</li>
+								</ul>
+					      	</div> -->
+					    </div>
+				  	</div>
+				 	<div class="panel-group" id="accordion">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="showUpFileClick()">海报上传</a>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse in animated fadeIn" ng-show="showUpFile">
+								<up-file></up-file>
+								<div class="col-xs-12 panel panel-success" style="padding:0">
+									<div class="panel-heading">当前海报</div>
+									<div class="panel-body">
+
+										<img ng-if="editFilmData.image" ng-src="{{editFilmData.image}}" alt="当前海报" height="120">
+										<img ng-if="!editFilmData.image" src="./img/title/no_has_pic2.gif" alt="当前海报" height="120">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>				
+            </div>
+            <div class="modal-footer">  
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+                <button type="button" class="btn btn-primary" ng-click="editFilmSubmit()">保存</button>  
+            </div> 
+        </script>
+    </div>
+
+    <!--添加电影模态框模板-->
+    <div>
+        <script type="text/ng-template" id="filmAdd.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">添加电影
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" name="filmAddForm" verify-scope>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">电影名字:</label>
+					    <div class="col-sm-6">
+					    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="searchFilmName" placeholder="输入搜索的电影名字">
+					    </div>
+					     <div class="col-sm-2 text-right">
+					    	<button class="btn btn-primary" ng-click="getDoubanFilm()">查询</button>
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				  		<table class="table table-bordered table-hover" style="width:77%;margin-left: 12%;margin-bottom: 0" ng-show="filmChooseList.length > 0">
+							<thead>
+								<tr>
+									<th class="text-center">名称</th>
+									<th class="text-center">导演</th>
+									<th class="text-center">时间</th>
+									<th class="text-center">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="film in filmChooseList">
+									<td class="text-center">
+										<a ng-href="{{film.alt}}" target="_blank">{{film.title}}</a>
+									</td>
+									<td class="text-center">{{film.directors[0].name}}</td>
+									<td class="text-center">{{film.year}}</td>
+									<td class="text-center clearPadding"><button class="btn btn-primary  small" ng-click="chooseDoubanResult(film)">选择</button></td>
+								</tr>
+							</tbody>
+						</table>
+				  	</div>
+				  	<div class="panel-group" id="accordion">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="ShowMovieInfo()">电影详情</a>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse in animated fadeIn" ng-show="isShowMovieInfo">
+							<div class="form-group">
+							    	<label class="col-sm-3 control-label">电影名字:</label>
+								    <div class="col-sm-8">
+								      	<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="addFilmData.film_name" placeholder="输入电影名字">
+								    </div>
+							  	</div>
+								<div class="form-group">
+							    	<label class="col-sm-3 control-label">电影hash:</label>
+								    <div class="col-sm-8">
+								      	<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="addFilmData.name_hash" placeholder="输入电影hash">
+								    </div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">电影时长:</label>
+								    <div class="col-sm-8">
+								      	<input type="input" ng-verify="pattern:/^1[1-9]$|^[2-9]\d$|^1\d{2}$|^2\d{2}$/,errmsg:'请输入10到300的整数！'" class="form-control" ng-model="addFilmData.time_length" placeholder="输入电影时长">
+								    </div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">上映时间:</label>
+								    <div class="col-sm-8">
+								      	<!--<input type="input" ng-verify="pattern:/^19\d{2}$|^20\d{2}$/,errmsg:'请输入1900到2100的整数！'" class="form-control" ng-model="addFilmData.screen_time" placeholder="输入上映时间">-->
+										<input type="text" style="width: 35%;text-align: center;float: left;" class="form-control" readonly uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空"  ng-change="checkDateChange(checkDate)" />
+										<button type="button" style="float: left;margin-left: 10px;" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+									</div>
+							  	</div>
+							  	<div class="form-group">
+									<label class="col-sm-3 control-label">电影信息:</label>
+									<div class="col-sm-8">
+										<textarea class="form-control" rows="3" required ng-model="addFilmData.info" placeholder="输入电影信息"></textarea> 
+									</div>
+						  		</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">导演:</label>
+								    <div class="col-sm-8">
+								    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="addFilmData.director" placeholder="输入导演名字">
+								    </div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">主演:</label>
+								    <div class="col-sm-8">
+								      	<!-- <input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="addFilmData.protagonist" placeholder="输入主角名字"> -->
+								      	<div class="row p-0">
+								    		<div class="col-xs-9">
+											    <input type="input" class="form-control" ng-model="actor" placeholder="输入主角名字">
+								    		</div>
+											<div class="col-xs-2" style="padding:0;margin-left: 10px">
+												<button class="btn btn-primary small" ng-click="addActor()">添加主演</button>
+											</div>
+								    	</div>
+								    	
+								      	<div class="row" style="margin:10px 0 0 0">
+								      		<ul class="list-group text-center administrorUl">
+								      			<li class="list-group-item text-left" ng-repeat="actor in actorsArr" class="text-left">
+								      				{{ $index + 1 }} . {{actor}} 
+								      				<button class="btn btn-danger btn-circle m-l pull-right" style="margin-top:-7px" ng-click="delActor($index)">删除</button>
+								      			</li>
+											</ul>
+								      	</div>
+								    </div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">评分:</label>
+								    <div class="col-sm-8">
+								      	<input type="input" ng-verify="pattern:/^([0-9]\.\d$|[0-9]|(10.0)|(10))$/,errmsg:'请输入0到10的数字！'" class="form-control" ng-model="addFilmData.grade" placeholder="输入评分">
+								    </div>
+							  	</div>
+							  	<div class="form-group">
+							    	<label class="col-sm-3 control-label">类型:</label>
+								    <div class="col-sm-8">
+								    	<input type="input" ng-verify="min:1, max:12,errmsg:'不超过12字符!'" class="form-control" ng-model="addFilmData.class_describe" placeholder="输入电影类型">
+								    </div>
+							  	</div>
+							</div>
+						</div>
+					</div>
+
+			  		<div class="panel-group" id="accordion">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="ShowImgUpFile()">海报上传</a>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse in animated fadeIn" ng-show="isShowImgUpFile">
+								<up-file></up-file>
+								<div class="col-xs-12 panel panel-success p-0">
+									<div class="panel-heading">当前海报</div>
+									<div class="panel-body">
+										<img ng-if="addFilmData.image " ng-src="{{addFilmData.image}}" alt="当前海报" height="120">
+										<img ng-if="!addFilmData.image" src="./img/title/no_has_pic2.gif" alt="当前海报" height="120">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>				
+            </div>
+            <div class="modal-footer">  
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+                <button type="button" class="btn btn-primary" ng-click="addFilmSubmit()">添加</button>  
+            </div> 
+        </script>
+    </div>
+
+    <!--移入专题模态框模板-->
+    <div>
+        <script type="text/ng-template" id="chooseTopic.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">移入专题
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" name="filmAddForm" verify-scope>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">电影名字:</label>
+					    <div class="col-sm-6">
+					    	<select class="form-control" ng-model="special_sn" ng-change="getFilmlistByStoreSn()">
+					    		<option ng-repeat="x in topicList" value="{{x.special_sn}}">{{x.special_name}}</option>
+								<!-- <option value="">全国门店</option>
+								<option value="1">世界经济经济</option>
+								<option value="2">世界经济经济</option>
+								<option value="3">世界经济经济</option> -->
+							</select>
+					    </div>
+					    <div class="col-sm-2 text-right">
+					    	<button class="btn btn-primary" ng-click="addSpecialFilmSub()">添加</button>
+					    </div>
+				  	</div>
+				</form>				
+            </div>
+            <div class="modal-footer">  
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+            </div> 
+        </script>
+    </div>
+
+    <!-- 名人关联模态框 -->
+    <div>
+        <script type="text/ng-template" id="getCelebrityList.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">名人关联</h4>
+		    </div>
+            <div class="modal-body">
+                <div class="col-sm-12">
+                	<form class="form-horizontal" name="filmEditorForm" verify-scope>
+	                	<div class="form-group">
+						    <div class="col-sm-6 col-sm-offset-2">
+						    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="celebrityName" placeholder="输入名人名字">
+						    </div>
+						    <div class="col-sm-4">
+						    	<button class="btn btn-primary" ng-click="searchCelebrity()">搜索</button>
+						    </div>
+					  	</div>
+				  	</form>
+                </div>
+                <div class="col-sm-12" style="clear:both">
+                	<ul class="list-group text-center administrorUl">
+		      			<li class="list-group-item text-left" ng-repeat="searchResult in searchResults" class="text-left">
+		      				{{searchResult.name}}
+		      				<button class="btn btn-danger btn-circle m-l pull-right" style="margin-top:-7px" ng-click="addRelation(searchResult)">添加</button>
+		      				<ul class="checkbox pull-right m-t-none">
+								<label class="i-checks">
+									<input type="radio" ng-checked="true" name="is_recommend" ng-model="addData.type" ng-value="1"><i></i>演员
+								</label>
+								<label class="i-checks">
+									<input type="radio" ng-checked="type == 2" name="is_recommend" ng-model="addData.type" ng-value="2"><i></i>导演
+								</label>
+							</ul>
+		      			</li>
+					</ul>
+                </div>
+                <hr>
+                <div class="col-sm-12" style="clear:both">
+                	<p class="text-center m-t-sm f-t-20" ng-show="celebrityList.length > 0">已关联名人</p>
+                	<p class="text-center m-t-sm f-t-20" ng-show="celebrityList.length == 0">暂无关联名人</p>
+                	<ul class="list-group text-center administrorUl">
+		      			<li class="list-group-item text-left" ng-repeat="celebrity in celebrityList" class="text-left">
+		      				{{ $index+1 }} . {{celebrity.name}} 
+		      				<span ng-show="celebrity.type == 2">(导演)</span>
+		      				<button class="btn btn-danger btn-circle m-l pull-right" style="margin-top:-7px" ng-click="delRelation(celebrity)">删除</button>
+		      			</li>
+					</ul>
+                </div>
+            </div>
+            <div class="modal-footer" style="border:none">
+            </div>
+        </script>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 --> 
+<div class="pt_36 text-left font16">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn">
+		<div class="topicHeader">
+			<form class="navbar-form navbar-form-sm navbar-left shift w-full p-10 boder-t" ui-shift="prependTo" target=".navbar-collapse" role="search">
+				<!-- <div class="form-group m-l-20">
+					<button class="btn btn-success">综合排序</button>
+				</div>
+				<div class="form-group m-l-20">
+					<button class="btn btn-default">按最新</button>
+				</div>
+				<div class="form-group m-l-20">
+					<button class="btn btn-default">按最热</button>
+				</div> -->
+				<div class="form-group m-r-xl pull-right">
+					<button class="btn btn-warning" ng-click="toNewTopic()">新建专题</button>
+				</div>
+			</form>
+		</div>
+		<div class="topicTitle w-full boder-t">
+			专题详情
+		</div>
+		<div class="topicBody">
+			<div class="topicList">
+				<div class="topicInfo" ng-repeat="topic in topicListData">
+					<div class="topicImg flex-1">
+						<img src="{{topic.image}}" alt="">
+					</div>
+					<div class="topicDes flex-8">
+						<div class="pull-left topicDesName flex-1">{{topic.special_name}}</div>
+						<div class="pull-left topicDesText flex-4">
+								<p><span class="font-bold">专题介绍</span>：{{topic.info}}</p>
+						</div>
+					</div>
+					<div class="topicFilm flex-3">
+						<button class="btn btn-success" ng-click="toTopicFilmList(topic)">专题电影</button>
+						<button class="btn btn-success" ng-click="toEditTopic(topic)">修改专题</button>
+						<button class="btn btn-success" ng-click="delTopic(topic)">删除专题</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

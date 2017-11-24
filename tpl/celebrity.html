@@ -1,0 +1,225 @@
+<div class="pull-right m-r-lg m-md">
+	<button class="btn btn-primary" ng-click="addCelebrity()">增加名人</button>
+</div>
+<!-- 名人列表 -->
+<div class="filmMgrListWrap text-center">
+	<div class="filmMgrListHeader">
+		<div class="pull-left flex-1 filmMgrListHeader-first">序号</div>
+		<div class="pull-left flex-2">图片</div>
+		<div class="pull-left flex-2">名人名称</div>
+		<div class="pull-left flex-8 text-left text-indent-20">名人详情</div>
+		<div class="pull-left flex-3">操作</div>
+	</div>
+	<div class="filmMgrListBody">
+		<div class="filmInfo" ng-repeat="celebrityList in celebrityListData">
+			<div class="filmSort flex-1">{{$index + 1}}</div>
+			<div class="filmImg flex-2">
+				<img src="{{celebrityList.image}}" alt="">
+			</div>
+			<div class="filmName flex-2">{{celebrityList.name}}</div>
+			<div class="filmDes flex-8">
+				<div class="flex-1">
+					<p style="line-height: 84px;"><span>性别</span>：{{celebrityList.gender | sexStatus}}</p>
+					<!-- <p><span>出生地点</span>：{{celebrityList.born_place}}</p> -->
+					<!-- <p><span>出生日期</span>：{{celebrityList.birthday | turnDateYMD}}</p> -->
+				</div>
+				<!-- <div class="flex-1">
+					<p><span>身份</span>: {{celebrityList.professions}}</p>
+					<p><span>星座</span>: {{celebrityList.constellation}}</p>
+				</div> -->
+				<div class="flex-4">
+					<p style="white-space:normal;height: 80px;overflow: hidden"><span>描述</span>：{{celebrityList.info}}</p>
+				</div>
+			</div>
+			<div class="filmOptions flex-3">
+				<div class="flex-1  l-h-100">
+					<button class="btn btn-default" ng-click="editCelebrity(celebrityList)">编辑</button>
+					<button class="btn btn-default" ng-click="delCelebrity(celebrityList,$index)">删除</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div style="position: relative;overflow: hidden">
+	<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+	<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+		<input type="text" ng-model="reqPage" style="width: 36px">
+		<button type="button" ng-click="setPage()" >跳转</button>
+		最大页数: {{maxPage}} 页
+	</div>
+</div>
+
+<!--添加名人模态框模板-->
+<div>
+    <script type="text/ng-template" id="addCelebrity.html">
+    	<div class="modal-header">
+	        <h4 class="modal-title text-center">添加名人
+				<button type="button" class="close" ng-click="close()">
+			 		<span aria-hidden="true">&times;</span>
+			 		<span class="sr-only">Close</span>
+				</button>
+	        </h4>
+	    </div>
+        <div class="modal-body">
+			<form class="form-horizontal" name="filmAddForm" verify-scope>
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">名字:</label>
+				    <div class="col-sm-8">
+				      	<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="addCelebrity.name" placeholder="输入名字">
+				    </div>
+			  	</div>
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">性别:</label>
+				    <div class="col-sm-8">
+				      	<select class="form-control" ng-model="addCelebrity.gender" ng-change="getFilmlistByStoreSn()">
+							<option value="0">男</option>
+							<option value="1">女</option>
+						</select>
+				    </div>
+			  	</div>
+<!-- 			  	<div class="form-group">
+			    	<label class="col-sm-3 control-label">出生地点:</label>
+				    <div class="col-sm-8">
+				      	<input type="input"  class="form-control" ng-model="addCelebrity.born_place" placeholder="输入出生地点">
+				    </div>
+			  	</div> -->
+<!-- 			  	<div class="form-group">
+			    	<label class="col-sm-3 control-label">出生日期:</label>
+				    <div class="col-sm-8">
+						<input type="text" style="width: 35%;text-align: center;float: left;" class="form-control" readonly uib-datepicker-popup ng-model="addCelebrity.birthday" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空" />
+						<button type="button" style="float: left;margin-left: 10px;" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+					</div>
+			  	</div> -->
+
+<!-- 			  	<div class="form-group">
+			    	<label class="col-sm-3 control-label">职业身份:</label>
+				    <div class="col-sm-8">
+				    	<input type="input" class="form-control" ng-model="addCelebrity.professions" placeholder="输入职业身份">
+				    </div>
+			  	</div> -->
+
+<!-- 			  	<div class="form-group">
+			    	<label class="col-sm-3 control-label">星座:</label>
+				    <div class="col-sm-8">
+				      	<select class="form-control" ng-model="addCelebrity.constellation" ng-change="getFilmlistByStoreSn()">
+							<option value="白羊座">白羊座</option>
+							<option value="金牛座">金牛座</option>
+							<option value="双子座">双子座</option>
+							<option value="巨蟹座">巨蟹座</option>
+							<option value="狮子座">狮子座</option>
+							<option value="处女座">处女座</option>
+							<option value="天枰座">天枰座</option>
+							<option value="天蝎座">天蝎座</option>
+							<option value="射手座">射手座</option>
+							<option value="摩羯座">摩羯座</option>
+							<option value="双鱼座">双鱼座</option>
+							<option value="水瓶座">水瓶座</option>
+						</select>
+				    </div>
+			  	</div> -->
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">描述:</label>
+				    <div class="col-sm-8">
+						<textarea class="form-control" rows="5" required ng-model="addCelebrity.info"></textarea> 
+				    </div>
+			  	</div>
+		  		<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="ShowImgUpFile()">头像上传</a>
+							</h4>
+						</div>
+						<div id="collapseOne" class="panel-collapse collapse in animated fadeIn">
+							<up-file></up-file>
+							<div class="col-xs-12 panel panel-success" style="padding:0">
+								<div class="panel-heading">当前头像</div>
+								<div class="panel-body">
+									<img ng-if="addCelebrity.image " ng-src="{{addCelebrity.image}}" alt="当前头像" height="120">
+									<img ng-if="!addCelebrity.image" src="./img/title/no_has_pic2.gif" alt="当前头像" height="120">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>				
+        </div>
+        <div class="modal-footer">  
+            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+            <button type="button" class="btn btn-primary" ng-click="addCelebritySub()">添加</button>  
+        </div> 
+    </script>
+</div>
+
+<!--编辑名人模态框模板-->
+<div>
+    <script type="text/ng-template" id="editCelebrity.html">
+    	<div class="modal-header">
+	        <h4 class="modal-title text-center">编辑名人
+				<button type="button" class="close" ng-click="close()">
+			 		<span aria-hidden="true">&times;</span>
+			 		<span class="sr-only">Close</span>
+				</button>
+	        </h4>
+	    </div>
+        <div class="modal-body">
+			<form class="form-horizontal" name="filmAddForm" verify-scope>
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">名字:</label>
+				    <div class="col-sm-8">
+				      	<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="editCelebrity.name" placeholder="输入名字">
+				    </div>
+			  	</div>
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">性别:</label>
+				    <div class="col-sm-8">
+				      	<select class="form-control" ng-model="editCelebrity.gender" ng-change="getFilmlistByStoreSn()">
+							<option value="0">男</option>
+							<option value="1">女</option>
+						</select>
+				    </div>
+			  	</div>
+				<div class="form-group">
+			    	<label class="col-sm-3 control-label">描述:</label>
+				    <div class="col-sm-8">
+						<textarea class="form-control" rows="5" required ng-model="editCelebrity.info"></textarea> 
+				    </div>
+			  	</div>
+		  		<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="ShowImgUpFile()">头像上传</a>
+							</h4>
+						</div>
+						<div id="collapseOne" class="panel-collapse collapse in animated fadeIn">
+							<up-file></up-file>
+							<div class="col-xs-12 panel panel-success" style="padding:0">
+								<div class="panel-heading">当前头像</div>
+								<div class="panel-body">
+									<img ng-if="editCelebrity.image" ng-src="{{editCelebrity.image}}" alt="" height="120">
+									<img ng-if="newImage" ng-src="{{newImage}}" alt="" height="120">
+									<img ng-if="!editCelebrity.image" src="./img/title/no_has_pic2.gif" alt="当前头像" height="120">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>				
+        </div>
+        <div class="modal-footer">  
+            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+            <button type="button" class="btn btn-primary" ng-click="editCelebritySub()">修改</button>  
+        </div> 
+    </script>
+</div>
+
+<!-- 上传图片提示框 -->
+<div class="alert alert-success fade in tipBoxDiv" ng-show="tipBox">          
+	<button class="close" type="button" data-dismiss="alert">      
+		<span>×</span>           
+	</button>            
+	<p>             
+		提示：{{tipBoxText}}！            
+	</p>             
+</div>

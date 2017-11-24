@@ -1,0 +1,510 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 --> 
+<div class="pt_36  text-center font16" style="margin-top:20px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn text-left" style="overflow: hidden">
+		<div class="m-l-20 pull-left">
+			<div class="btn-group">
+				<label ng-class="checkModel1" btn-checkbox ng-click="clickTable(1)">抵用券</label>
+				<label ng-class="checkModel2" btn-checkbox ng-click="clickTable(2)">统计</label>
+			</div>
+		</div>
+		<div class="pull-left">
+			<button class="btn btn-primary m-l-20" ng-click="createActivity()">新建抵用券</button>
+		</div>
+		<div class="m-t-md clear-both" ng-show="checkModel1 == 'btn btn-default active'">
+			<table class="table table-responsive table-bordered table-hover m-t-xxl">
+				<thead>
+					<tr>
+						<th ng-cloak class="text-center">抵用券名字</th>
+						<th ng-cloak class="text-center">面值范围</th>
+						<th ng-cloak class="text-center">创建日期</th>
+						<th ng-cloak class="text-center">使用日期</th>
+						<th ng-cloak class="text-center">发券日期</th>
+						<th ng-cloak class="text-center">发放人数</th>
+						<th ng-cloak class="text-center">每人领取个数</th>
+						<th ng-cloak class="text-center">领取人数</th>
+						<th ng-cloak class="text-center">使用人数</th>
+						<th ng-cloak class="text-center">使用人次</th>
+						<th ng-cloak class="text-center">操作</th>
+						<th ng-cloak class="text-center">状态</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="activity in activityList">
+						<td ng-cloak class="text-center">
+							<a class="cur-pointer" ng-click="ediActivity(activity)">{{activity.activity_name}}</a>
+						</td>
+						<td ng-cloak class="text-center">{{activity.min_price}} -  {{activity.max_price}}</td>
+						<td ng-cloak class="text-center">{{activity.create_time | turnDateYMD}}</td>
+						<td ng-cloak class="text-center">{{activity.use_begin | turnDateYMD}}至{{activity.use_end | turnDateYMD}}</td>
+						<td ng-cloak class="text-center">{{activity.publish_begin | turnDateYMD}}至{{activity.publish_end | turnDateYMD}}</td>
+						<td ng-cloak class="text-center">{{activity.total}}</td>
+						<td ng-cloak class="text-center">{{activity.number}}</td>
+						<td ng-cloak class="text-center">{{activity.get_count}}</td>
+						<td ng-cloak class="text-center">{{activity.use_count}}</td>
+						<td ng-cloak class="text-center">{{activity.use_number}}</td>
+						<td ng-cloak class="text-center">
+							<a class="cur-pointer" ng-click="getRecord(activity)">领取详情</a>
+						</td>
+						<td ng-cloak class="text-center normalStaff" ng-if="activity.status == 1">启用中</td>
+						<td ng-cloak class="text-center formalStaff" ng-if="activity.status == 2">禁用中</td>
+						<!-- <td ng-cloak class="text-center" ng-if="activity.status == 3">未启用</td> -->
+					</tr>
+				</tbody>
+			</table>
+			<div style="position: relative;overflow: hidden;">
+				<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+				<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+					<input type="text" ng-model="reqPage" style="width: 36px">
+					<button type="button" ng-click="setPage()" >跳转</button>
+					最大页数: {{maxPage}} 页
+				</div>
+			</div>
+		</div>
+		<div class="m-l-20 m-t-md clear-both" ng-show="checkModel2 == 'btn btn-default active'">
+			<div style="width: 200px;margin: 20px 0;clear: both;margin-top: 50px">
+		        <select class="form-control" ng-model="activity_sn"  ng-change="changeActivety()">
+					<option ng-repeat="x in activityList" value="{{x.activity_sn}}">{{x.activity_name}}</option>
+				</select>
+			</div>
+			
+	        <span class="clearfix"></span>
+			<table class="table table-responsive table-bordered table-hover">
+				<thead>
+					<tr>
+						<th ng-cloak class="text-center">日期</th>
+						<th ng-cloak class="text-center">领取人数</th>
+						<th ng-cloak class="text-center">使用人次</th>
+						<th ng-cloak class="text-center">抵用券总额</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="activity in activityDayDetailArr">
+						<td ng-cloak class="text-center">{{activity.create_day}}</td>
+						<td ng-cloak class="text-center">{{activity.total_user}}</td>
+						<td ng-cloak class="text-center">{{activity.total_count}}</td>
+						<td ng-cloak class="text-center">{{activity.total_price}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+
+	<!--发布抵用券模板-->
+	<div>
+		<script type="text/ng-template" id="createActivity.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">发布抵用券
+					<button type="button" class="close" ng-click="close()">
+						<span aria-hidden="true">&times;</span>
+						<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal addVouchersForm" role="form" name="addVouchersForm" verify-scope>
+					<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">抵用券名称：</label>
+					 	<div class="col-sm-7 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="activity_name" placeholder="请输入抵用券名称">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">抵用券面值范围：</label>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="min_price">
+					 	</div>
+					 	<div class="pull-left line-h-34 p-l-r-10">
+					 		至
+					 	</div>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="max_price">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">每人领取个数：</label>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="number">
+					 	</div>
+					 	<div class="col-sm-3 text-right line-h-34">
+					 		总领取人数：
+					 	</div>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="total">
+					 	</div>
+				 	</div>
+<!-- 				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">适用门店：</label>
+					 	<div class="col-sm-4 p-0">
+					 		<select select2 ng-model="store" class="form-control" placeholder="搜索门店">
+		                    	<option value="{{ store }}" ng-repeat="store in storeListData">{{ store.store_name }}</option>
+			                </select>
+			                <span class="clearfix"></span>
+					 	</div>
+					 	<div class="col-sm-4 p-0" style="margin-left: 16px">
+					 		<button class="btn btn-primary" ng-click="addChooseStore()">添加</button>
+					 	</div>
+				 	</div> -->
+			 		<div class="form-group vouchersChooseSto">
+			      		<ul class="list-group text-center administrorUl" style="max-height: 200px;overflow-y: scroll;">
+			      			<li class="list-group-item text-left" class="text-left" ng-repeat="chooseStore in chooseStoreList">
+			      				{{$index + 1}}{{chooseStore.store_name}}
+			      				<button class="btn btn-danger btn-circle m-l pull-right m-t-button" ng-click="deletChooseStore($index,chooseStore)">删除</button>
+			      			</li>
+						</ul>
+			      	</div>
+			      	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">领取用户：</label>
+					 	<div class="col-sm-7 p-0">
+					 		<label class="checkbox-inline i-checks">
+								<input type="radio" checked="" name="confirmOrder" ng-model="user_type" ng-value="1"><i></i>新用户
+							</label>
+							<label class="checkbox-inline i-checks">
+								<input type="radio" name="confirmOrder" ng-model="user_type" ng-value="2"><i></i>老用户
+							</label>
+							<label class="checkbox-inline i-checks">
+								<input type="radio" name="confirmOrder" ng-model="user_type" ng-value="3"><i></i>全部
+							</label>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">发券截止日期：</label>
+				 		<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="publish_begin" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox1()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+					 	<div class="col-sm-1 line-h-34">
+					 		至
+					 	</div>
+					 	<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="publish_end" is-open="popup4.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox4()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">适用有效日期：</label>
+				 		<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="use_begin" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+					 	<div class="col-sm-1 line-h-34">
+					 		至
+					 	</div>
+					 	<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="use_end" is-open="popup3.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox3()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">活动状态：</label>
+					 	<div class="col-sm-7 p-0">
+					 		<label class="checkbox-inline i-checks">
+								<input type="radio" checked="" name="confirmStatus" ng-model="activityInfo.status" ng-checked="activityInfo.status == 1" ng-value="1"><i></i>启用中
+							</label>
+							<label class="checkbox-inline i-checks">
+								<input type="radio" name="confirmStatus" ng-model="activityInfo.status" ng-checked="activityInfo.status == 2" ng-value="2"><i></i>禁用中
+							</label>
+					 	</div>
+				 	</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">取消关闭</button>
+				<button type="button" class="btn btn-primary" ng-click="createActivity()">确定发布</button>
+			</div>
+		</script>
+	</div>
+
+	
+	<!--编辑抵用券模板-->
+	<div>
+		<script type="text/ng-template" id="ediActivity.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">编辑抵用券
+					<button type="button" class="close" ng-click="close()">
+						<span aria-hidden="true">&times;</span>
+						<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal ediVouchersForm" role="form" name="ediVouchersForm" verify-scope>
+					<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">抵用券名称：</label>
+					 	<div class="col-sm-7 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="activityInfo.activity_name" placeholder="请输入抵用券名称">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">抵用券面值范围：</label>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="activityInfo.min_price">
+					 	</div>
+					 	<div class="pull-left line-h-34 p-l-r-10">
+					 		至
+					 	</div>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="activityInfo.max_price">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">每人领取个数：</label>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="activityInfo.number">
+					 	</div>
+					 	<div class="col-sm-3 text-right line-h-34">
+					 		总领取人数：
+					 	</div>
+					 	<div class="col-sm-2 p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="activityInfo.total">
+					 	</div>
+				 	</div>
+			      	<!-- <div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">适用门店：</label>
+					 	<div class="col-sm-4 p-0">
+			                <select select2 ng-model="store" class="form-control" placeholder="搜索门店">
+		                    	<option value="{{ store }}" ng-repeat="store in activityStoreList">{{ store.store_name }}</option>
+			                </select>
+			                <span class="clearfix"></span>
+					 	</div>
+					 	<div class="col-sm-4 p-0" style="margin-left: 16px">
+					 	</div>
+				 	</div> -->
+			      	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">领取用户：</label>
+					 	<div class="col-sm-7 p-0">
+					 		<label class="checkbox-inline i-checks">
+								<input type="radio" checked="" name="confirmOrder" ng-model="activityInfo.user_type" ng-checked="activityInfo.user_type == 1" ng-value="1"><i></i>新用户
+							</label>
+							<label class="checkbox-inline i-checks">
+								<input type="radio" name="confirmOrder" ng-model="activityInfo.user_type" ng-checked="activityInfo.user_type == 2" ng-value="2"><i></i>老用户
+							</label>
+							<label class="checkbox-inline i-checks">
+								<input type="radio" name="confirmOrder" ng-model="activityInfo.user_type" ng-checked="activityInfo.user_type == 3" ng-value="3"><i></i>全部
+							</label>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">发券截止日期：</label>
+				 		<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="activityInfo.publish_begin" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox1()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+					 	<div class="col-sm-1 line-h-34">
+					 		至
+					 	</div>
+					 	<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="activityInfo.publish_end" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">适用有效日期：</label>
+				 		<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="activityInfo.use_begin" is-open="popup3.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox3()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+					 	<div class="col-sm-1 line-h-34">
+					 		至
+					 	</div>
+					 	<div class="col-sm-3 p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="activityInfo.use_end" is-open="popup4.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox4()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">活动状态：</label>
+					 	<div class="col-sm-7 p-0">
+					 		<label class="checkbox-inline i-checks">
+								<input type="radio" checked="" name="confirmStatus" ng-model="activityInfo.status" ng-checked="activityInfo.status == 1" ng-value="1"><i></i>启用中
+							</label>
+							<label class="checkbox-inline i-checks">
+								<input type="radio" name="confirmStatus" ng-model="activityInfo.status" ng-checked="activityInfo.status == 2" ng-value="2"><i></i>禁用中
+							</label>
+					 	</div>
+				 	</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" ng-click="delVouchers()">删除</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">取消关闭</button>
+				<button type="button" class="btn btn-primary" ng-click="ediSubmit()">确定修改</button>
+			</div>
+		</script>
+	</div>
+	<!--领取抵用券记录模板-->
+	<div>
+		<script type="text/ng-template" id="getRecord.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">领取记录
+					<button type="button" class="close" ng-click="close()">
+						<span aria-hidden="true">&times;</span>
+						<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+			<!-- 搜索条件 -->
+				<form class="form-inline m-l-20">
+		            <div class="form-group">
+		                <p class="form-control-static">使用状态：</p>
+		                <select class="form-control text-left" ng-model="isUsed">
+		                    <option value="" ng-selected="true">全部</option>
+		                    <option value="1">已使用</option>
+		                    <option value="0">未使用</option>
+		                </select>
+		            </div>
+		            <div class="form-group" style="width: 450px">
+					 	<label for="" class="col-sm-3 control-label line-h-34 text-right" style="padding-right: 0">领取时间：</label>
+				 		<div class="pull-left p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="obtainBegin" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox1()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+					 	<div class="pull-left line-h-34 p-l-r-10">
+					 		至
+					 	</div>
+					 	<div class="pull-left p-0">
+					 		<p style="width: 150px;margin: 0" class="input-group pull-left">
+			                    <input type="text" class="form-control" uib-datepicker-popup ng-model="obtainEnd" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			                    <span class="input-group-btn">
+			                        <button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+			                    </span>
+			                </p>
+					 	</div>
+		            </div>
+		            <div class="form-group">
+				 		<label for="" class="col-sm-4 control-label w-100 line-h-34 text-right" style="padding-right: 0">手机号码：</label>
+					 	<div class="pull-left p-0">
+					 		<input type="text" class="form-control" id=""  ng-model="mobile" placeholder="请输入手机号码">
+					 	</div>
+				 	</div>
+		            <button type="button" class="btn btn-primary m-l-20" ng-click="searchBtn()">搜索</button>
+		            <button type="button" class="btn btn-primary m-l-20" ng-click="emptySearch()">清空</button>
+		        </form>
+				
+				<table class="table table-responsive table-bordered table-hover m-t-sm">
+					<thead>
+						<tr>
+							<th ng-cloak class="text-center">用户</th>
+							<th ng-cloak class="text-center">手机</th>
+							<th ng-cloak class="text-center">领取日期</th>
+							<th ng-cloak class="text-center">优惠券</th>
+							<th ng-cloak class="text-center">是否使用</th>
+							<th ng-cloak class="text-center">使用状态</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="coupon in couponList">
+							<td ng-cloak class="text-center">{{coupon.user_name}}</td>
+							<td ng-cloak class="text-center">{{coupon.mobile}}</td>
+							<td ng-cloak class="text-center">{{coupon.create_time | turnDateYMD}}</td>
+							<td ng-cloak class="text-center">{{coupon.price}}元</td>
+							<td ng-cloak class="text-center normalStaff" ng-show="coupon.is_used == 0">未使用</td>
+							<td ng-cloak class="text-center formalStaff" ng-show="coupon.is_used == 1">已使用</td>
+							<td ng-cloak class="text-center">
+								<a class="cur-pointer" ng-click="getCouponOrder(coupon)">详情</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div style="position: relative;overflow: hidden;">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" items-per-page="perPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+					<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+						<input type="text" ng-model="reqPage" style="width: 36px">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+				<button type="button" class="btn btn-primary" ng-click="settle()">确定</button>
+			</div>
+		</script>
+	</div>
+
+	<!--抵用券使用详情模板-->
+	<div>
+		<script type="text/ng-template" id="getVouchersInfo.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">抵用券使用详情
+					<button type="button" class="close" ng-click="close()">
+						<span aria-hidden="true">&times;</span>
+						<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<table class="table table-responsive table-bordered table-hover m-t-sm">
+					<thead>
+						<tr>
+							<th ng-cloak class="text-center">订单金额</th>
+							<th ng-cloak class="text-center">日期</th>
+							<th ng-cloak class="text-center">门店</th>
+							<th ng-cloak class="text-center">包间</th>
+							<th ng-cloak class="text-center">场次</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-show="couponInfoList.price">
+							<td ng-cloak class="text-center">{{couponInfoList.price}}</td>
+							<td ng-cloak class="text-center">{{couponInfoList.reserve_time | turnDateYMD}}</td>
+							<td ng-cloak class="text-center">{{couponInfoList.info.store_name}}</td>
+							<td ng-cloak class="text-center">{{couponInfoList.info.room_name}}</td>
+							<td ng-cloak class="text-center">{{couponInfoList.info.duration_time}}</td>
+						</tr>
+					</tbody>
+				</table>
+<!-- 				<div style="position: relative;overflow: hidden;">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 20%"></ul>
+					<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+						<input type="text" ng-model="reqPage" style="width: 36px">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div> -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+			</div>
+		</script>
+	</div>
+</div>

@@ -1,0 +1,96 @@
+<div class="userAssessContent">
+	<div class="panel panel-default">
+		<div class="panel-heading font-bold">
+			电影黑名单
+		</div>
+		<div class="panel-body">
+			<form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse" role="search" style="padding:0">
+				<div class="form-group">
+					<button class="btn btn-success" style="margin-left: 20px" ng-click="addBalckFilm()">添加黑名单</button>
+				</div>
+			</form>
+			<table class="table table-responsive table-bordered table-hover filmTable">
+				<thead>
+				<tr>
+					<th ng-cloak class="text-center">电影名字</th>
+					<th ng-cloak class="text-center">电影名字</th>
+					<th ng-cloak class="text-center">电影名字</th>
+					<th ng-cloak class="text-center">电影名字</th>
+					<th ng-cloak class="text-center">电影名字</th>
+					<th ng-cloak class="text-center">电影名字</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="filmData in blackFilmListData">
+					<td ng-repeat="film in filmData" ng-cloak class="text-center" style="max-width:30px;">{{film}}
+						<a href="javascript:;" style="cursor:pointer;float: right" ng-click="editBalckFilm($index,film)">编辑</a>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+
+			<!--<div style="position: relative;overflow: hidden">-->
+				<!--<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>-->
+				<!--<div class="pull-left" style="margin-top: 20px;margin-left: 20px">-->
+					<!--<input type="text" ng-model="reqPage" style="width: 36px">-->
+					<!--<button type="button" ng-click="setPage()" >跳转</button>-->
+					<!--最大页数: {{maxPage}} 页-->
+				<!--</div>-->
+			<!--</div>-->
+		</div>
+	</div>
+</div>
+<!-- 电影黑名单添加 -->
+<div>
+	<script type="text/ng-template" id="addForbidFilm.html">
+		<div class="modal-header">
+			<h4 class="modal-title text-center">黑名单
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">黑名单:</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control"  ng-model="blackFilmName" ></input>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+			<button type="button" class="btn btn-primary" ng-click="blackSubmit()">提交</button>
+		</div>
+	</script>
+</div>
+<!-- 电影黑名单编辑 -->
+<div>
+	<script type="text/ng-template" id="editForbidFilm.html">
+		<div class="modal-header">
+			<h4 class="modal-title text-center">黑名单
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">黑名单:</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" ng-model="blackFilmName"></input>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-warning" style="float:left" data-dismiss="modal" ng-click="blackDel()">删除</button>
+			<button type="button" class="btn btn-primary" ng-click="blackSubmit()">保存</button>
+		</div>
+	</script>
+</div>

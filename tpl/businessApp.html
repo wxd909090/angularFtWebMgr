@@ -1,0 +1,181 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 -->
+<div class="pt_36 text-left font16">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+    <div class="animated fadeIn mytable" style="padding: 0 15px;margin-top: 20px">
+		<div class="text-left">
+			<button class="btn btn-primary" ng-click="businessAppAdd()">新增</button>
+		</div>
+		<table class="table table-responsive table-bordered table-hover m-t-sm filmTable">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center w-100">应用名</th>
+		            <th ng-cloak class="text-center w-150">版本号</th>
+		            <th ng-cloak class="text-center w-150">添加时间</th>
+		            <th ng-cloak class="text-left text-indent-20">下载链接</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+				<tr ng-repeat="businessApp in businessAppData">	
+					<td ng-cloak class="text-center p-0">
+						<a href="javascript:;" ng-click="editBusinessApp(businessApp)">{{businessApp.app_id | appType}}</a>
+					</td>
+					<td ng-cloak class="text-center p-0">{{businessApp.version}}</td>
+					<td ng-cloak class="text-center p-0">{{businessApp.create_time | turnDateYMD}}</td>
+					<td ng-cloak class="text-left p-0 text-indent-20">{{businessApp.download_url}}</td>
+				</tr>
+		    </tbody>
+		</table>
+		<div style="position: relative;overflow: hidden">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left m-t-md m-l-md">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>	
+	</div>
+    <div class="animated fadeIn col-lg-8 col-md-10 col-sm-12">
+		<div>
+			<script type="text/ng-template" id="businessAppAdd.html">
+				<div class="modal-header">
+					<h4 class="modal-title text-center">商家程序添加
+						<button type="button" class="close" ng-click="close()">
+					 		<span aria-hidden="true">&times;</span>
+					 		<span class="sr-only">Close</span>
+						</button>
+					</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form" name="editorForm" verify-scope>
+						<div class="form-group">
+					 		<label for="" class="col-sm-2 control-label">更新类型:</label>
+						 	<div class="col-sm-6">
+						 		<select class="form-control" ng-model="type">
+									<option value="movie_sync">电影同步</option>
+									<option value="upgrade">更新APP</option>
+								</select>
+						 	</div>
+					 	</div>
+						<div class="form-group">
+					 		<label for="" class="col-sm-2 control-label">版本号:</label>
+						 	<div class="col-sm-6">
+						 		<input type="text"  class="form-control" id="" ng-model="verNum" ng-blur="checkStoreAppVersionExist()" ng-focus="geInVersionExist()">
+						 	</div>
+						 	<div class="col-sm-4" style="font-size: 12px;height: 34px;line-height: 34px;color: red" ng-show="checkShowVer">
+						 		<span>该版本号已存在</span>
+						 	</div>
+					 	</div>
+					 	<div class="form-group">
+					 		<label for="" class="col-sm-2 control-label">文件MD5:</label>
+						 	<div class="col-sm-6">
+						 		<input type="text"  class="form-control" id="" ng-model="fileMd5">
+						 	</div>
+					 	</div>
+						<div class="form-group">
+							<label for="" class="col-sm-2 control-label">文件上传:</label>
+							<div class="col-sm-6">
+								<div class="input-group file-caption-main businessInput">
+									<input type="text"  class="form-control" id="" ng-model="fileName" ng-disabled="true">
+								</div>
+								<div class="input-group-btn businessUpBtn">
+							       		<div tabindex="500" class="btn btn-primary btn-file"><i class="glyphicon glyphicon-folder-open"></i>&nbsp;  <span class="hidden-xs">Browse …</span><input id="fileInput" class="file" type="file" multiple="" data-min-file-count="1" onchange="angular.element(this).scope().fileNameChanged()"></div>
+							       		<button type="button" class="btn btn-primary" id="uploadBtn" ng-click="upfileSubmit()">上传</button>
+							   		</div>
+				                	
+							</div>
+			            </div>
+			            <div class="form-group" ng-show="uploadFlag">
+			            	<label for="" class="col-sm-2 control-label"></label>
+			            	<div class="col-sm-6">
+			            		<div class="text-center">{{progressText}}</div>
+			            		<div class="progress">
+								  	<div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" ng-style="progressStyle">
+								  	</div>
+								</div>
+			            	</div>
+			            </div>
+			            <div class="form-group">
+					 		<label for="" class="col-sm-2 control-label">文件地址:</label>
+						 	<div class="col-sm-6">
+						 		<input type="text"  class="form-control" id="" ng-model="fileUrl">
+						 	</div>
+					 	</div>
+			    	</form>	
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="addBusinessSub()">保存</button>
+				</div>
+			</script>
+		</div>
+	</div>
+	<!--编辑APP模态框模板-->
+	<div>
+		<script type="text/ng-template" id="businessAppEdi.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">商家程序编辑
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" role="form" name="editorForm" verify-scope>
+					<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">应用名:</label>
+					 	<div class="col-sm-6">
+					 		<input type="text"  class="form-control" id="" ng-model="app_id" ng-disabled="true">
+					 	</div>
+				 	</div>
+					<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">版本号:</label>
+					 	<div class="col-sm-6">
+					 		<input type="text"  class="form-control" id="" ng-model="verNum" ng-disabled="true">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">文件MD5:</label>
+					 	<div class="col-sm-6">
+					 		<input type="text"  class="form-control" id="" ng-model="fileMd5">
+					 	</div>
+				 	</div>
+					<div class="form-group">
+						<label for="" class="col-sm-2 control-label">文件上传:</label>
+						<div class="col-sm-6">
+							<div class="input-group file-caption-main businessInput">
+								<input type="text"  class="form-control" id="" ng-model="fileName" ng-disabled="true">
+							</div>
+							<div class="input-group-btn businessUpBtn">
+						       		<div tabindex="500" class="btn btn-primary btn-file"><i class="glyphicon glyphicon-folder-open"></i>&nbsp;  <span class="hidden-xs">Browse …</span><input id="fileInput2" class="file" type="file" multiple="" data-min-file-count="1" onchange="angular.element(this).scope().fileNameChanged()"></div>
+						       		<button type="button" class="btn btn-primary" id="uploadBtn" ng-click="upfileSubmit()">上传</button>
+						   		</div>
+			                	
+						</div>
+		            </div>
+		            <div class="form-group" ng-show="uploadFlag">
+		            	<label for="" class="col-sm-2 control-label"></label>
+		            	<div class="col-sm-6">
+		            		<div class="text-center">{{progressText}}</div>
+		            		<div class="progress">
+							  	<div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" ng-style="progressStyle">
+							  	</div>
+							</div>
+		            	</div>
+		            </div>
+		            <div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">文件地址:</label>
+					 	<div class="col-sm-6">
+					 		<input type="text"  class="form-control" id="" ng-model="fileUrl">
+					 	</div>
+				 	</div>
+		    	</form>	
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deletApp()">删除</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editBusinessSub()">保存</button>
+			</div>
+		</script>
+	</div>
+</div>

@@ -1,0 +1,118 @@
+<div class="pt_36  text-center font16" style="margin-top:10px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated text-left fadeIn mytable">
+		<form class="form-inline m-l-20">
+		  	<div class="form-group">
+		    	<p class="form-control-static">使用状态：</p>
+		 		<select class="form-control text-left" ng-model="isBind">
+		 			<option value="" ng-selected="true">全部</option>
+		 			<option value="1">未绑定</option>
+		 			<option value="2">已绑定</option>
+		 		</select>
+		  	</div>
+		  	<div class="form-group m-l-20">
+		    	<p class="form-control-static">IMEI：</p>
+		    	<input type="text" class="form-control" id="" ng-model="imei" placeholder="请输入IMEI">
+		  	</div>
+		  	<div class="form-group m-l-20">
+		    	<p class="form-control-static">门店编号：</p>
+		    	<input type="text" class="form-control" id="" ng-model="storeSn" placeholder="请输入门店编号">
+		  	</div>
+		  	<button type="button" class="btn btn-primary m-l-20" ng-click="searchBtn()">搜索</button>
+		</form>
+		<table class="table table-responsive table-bordered table-hover m-t-sm">
+		    <thead>
+		        <tr>
+		        	<th ng-cloak class="text-center" style="width:50px">
+        				<label class="checkbox-inline i-checks">
+			              	<input type="checkbox" ng-model="option1" ng-click="checkAllChoose()"><i></i>
+			            </label>
+        			</th>
+		            <th ng-cloak class="text-center" width="80px">ID</th>
+		            <th ng-cloak class="text-center">IMEI</th>
+		            <th ng-cloak class="text-center">门店名称</th>
+		            <th ng-cloak class="text-center">门店编号</th>
+		            <th ng-cloak class="text-center">是否绑定</th>
+		            <th ng-cloak class="text-center">创建时间</th>
+		            <th ng-cloak class="text-center">修改时间</th>
+		            <th ng-cloak class="text-center">操作</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+				<tr ng-repeat="machine in machineList">
+					<td ng-cloak class="text-center">
+        				<label class="checkbox-inline i-checks">
+			              	<input type="checkbox" ng-model="machine.checked"><i></i>
+			            </label>
+			        </td>
+					<td ng-cloak class="text-center">{{machine.id}}</td>
+					<td ng-cloak class="text-center">{{machine.imei}}</td>
+					<td ng-cloak class="text-center">
+						{{machine.store_info.store_name}}
+					</td>
+					<td ng-cloak class="text-center">{{machine.store_info.store_sn}}</td>
+					<td ng-cloak class="text-center">{{machine.is_bind | isBindStatus}}</td>
+					<td ng-cloak class="text-center">{{machine.create_time | turnDateYMD}}</td>
+					<td ng-cloak class="text-center">{{machine.update_time | turnDateYMD}}</td>
+					<td ng-clock class="text-center clearPadding">
+		    			<button class="btn btn-info" ng-click="editMachine(machine,$index)">编辑</button>
+		    		</td>
+				</tr>
+		    </tbody>
+		</table>
+		<div class="group-buy-btns m-l-20 tableBottomBtns">
+    		<button class="btn btn-primary" ng-click="createMachineImei()">添加</button>
+    		<button class="btn btn-danger" ng-click="delMachineImei()">删除</button>
+    	</div>
+		<div style="position: relative;overflow: hidden;">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>
+	</div>
+	<!--添加门店Imei模板-->
+	<div>
+        <script type="text/ng-template" id="createMachineImei.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">添加IMEI</h4>
+		    </div>
+            <div class="modal-body">
+                <form class="form-inline m-l-20">
+				  	<div class="form-group">
+				    	<p class="form-control-static">IMEI数量：</p>
+		    			<input type="text" class="form-control" id="" ng-model="num" placeholder="请输入生成团购码的数量">
+				  	</div>
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-default" ng-click="close()">取消</button>
+				<button class="btn btn-primary" ng-click="createMachineImeiSub()">生成</button>
+            </div>
+        </script>
+    </div>
+    <!--编辑门店Imei模板-->
+	<div>
+        <script type="text/ng-template" id="ediMachineImei.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">绑定IMEI</h4>
+		    </div>
+            <div class="modal-body">
+                <div class="col-sm-8">
+                	<select select2 ng-model="store_sn" class="form-control" placeholder="搜索门店">
+                    <option value="{{ item.store_sn }}" ng-repeat="item in config2">{{ item.store_name }}</option>
+	                </select>
+	                <span class="clearfix"></span>
+                </div>
+                <div class="col-sm-4">
+                	<button class="btn btn-warning" ng-click="bindStoreSub()">绑定</button>
+                	<button class="btn btn-warning" ng-click="unbindStoreSub()">解绑</button>
+                </div>
+            </div>
+            <div class="modal-footer" style="border:none">
+            </div>
+        </script>
+    </div>
+</div>

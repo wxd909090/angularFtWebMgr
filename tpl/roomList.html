@@ -1,0 +1,674 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 --> 
+<div class="pt_36  text-center font16" style="margin-top:20px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable">
+		<div>
+			<p class="pull-left" style="margin-left: 20px;margin-top: 7px;">
+				{{storeName}} / <a ui-sref="app.storeList">返回</a>
+			</p>
+			<div class="titleColorWrap">
+				<div></div><p class="pull-left">已完成</p>
+				<div class="hidden"></div><p class="pull-left hidden">正在清洁</p>
+				<div></div><p class="pull-left">已被预约</p>
+				<div></div><p class="pull-left">正在观影</p>
+				<div></div><p class="pull-left">未付款</p>
+			</div>
+			<ul class="nav navbar-nav hidden-sm pull-right" style="margin-right: 20px">
+				<li class="dropdown" dropdown>
+					<a href data-toggle="dropdown" class="dropdown-toggle" style="padding:7px;color:#000">
+		              <i class="fa fa-fw fa-plus visible-xs-inline-block"></i>
+		              <span>门店菜单</span> <span class="caret"></span>
+		            </a>
+		            <ul class="dropdown-menu" role="menu">
+		           		<!--<li ng-click="editorRoomList()"><a href="javascript:;" class="text-center">房间列表</a></li>-->
+		              	<li ng-click="roomRecord()"><a href="javascript:;" class="text-center">消费记录</a></li>
+		              	<li ng-click="clearReord()"><a href="javascript:;" class="text-center">打扫记录</a></li>
+		              	<li ng-click="ediTemplet()"><a href="javascript:;" class="text-center">编辑模板</a></li>
+		              	<!-- <li><a href="javascript:;" class="text-center" ng-click="storeStatistics()">营业统计(无)</a></li> -->
+		              	<!-- <li><a href="javascript:;" class="text-center">包间测试</a></li> -->
+		            </ul>
+				</li>
+			</ul>
+			<p style="width: 190px;margin-right: 20px" class="input-group pull-right">
+	          	<input type="text" class="form-control" uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" />
+	          	<span class="input-group-btn">
+	            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+	          	</span>
+			</p>
+			<p class="pull-right" style="margin-right: 20px;">
+				<button class="btn btn-primary" ng-click="ediTemplet()">编辑模板</button>
+				<!-- <button class="btn btn-primary" ng-click="addRoom()">添加房间</button> -->
+				<button class="btn btn-primary" ng-click="reflushRoom()">刷新</button>
+			</p>
+		</div>
+		<div class="roomWrap">
+			<div class="roomWrapHeader">
+				<div>房间名称</div>
+<!-- 				<div>1</div>
+				<div>2</div>
+				<div>3</div>
+				<div>4</div>
+				<div>5</div>
+				<div>6</div>
+				<div>7</div>
+				<div>8</div>
+				<div>9</div> -->
+			</div>
+			<div class="roomWrapBody">
+				<div class="sinRoom" ng-repeat="room in roomInfo">
+					<div class="room_name_wrap" ng-if="room.status == 1">
+						(禁)
+						<span class="online_red" ng-show="room.online == 0"></span>
+						<span class="online_green" ng-show="room.online == 1"></span>
+						<a href="javascript:;" ng-click="editorRoom(room,$index)">{{room.room_name}}</a>
+					</div>
+					<div class="room_name_wrap" ng-if="room.status == 0">
+						<span class="online_red" ng-show="room.online == 0"></span>
+						<span class="online_green" ng-show="room.online == 1"></span>
+						<a href="javascript:;" ng-click="editorRoom(room,$index)">{{room.room_name}}</a>
+					</div>
+					<section ng-repeat="durationTime in room.durationList">
+						<div ng-if="durationTime.orderInfo.status == 0 " ng-click="roomDurationInfo(room,durationTime,$index)" class="noPay">{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}} <span class="priceColor">(￥{{durationTime.price | number : 0}})</span></div>
+						
+						<div ng-if="durationTime.orderInfo.status == 1" ng-click="roomDurationInfo(room,durationTime,$index)" class="ordered">{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}} <span class="priceColor">(￥{{durationTime.price | number : 0}})</span></div>
+						
+						<div ng-if="durationTime.orderInfo.status == 2" ng-click="roomDurationInfo(room,durationTime,$index)" class="useing">{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}} <span class="priceColor">(￥{{durationTime.price | number : 0}})</span></div>
+						
+						<div ng-if="durationTime.orderInfo.status == 3 " ng-click="roomDurationInfo(room,durationTime,$index)" class="roomOver">
+						<button class="btn btn-info addDurationBtn" ng-show="nowTime < durationTime.end_time" ng-click="mergeTime(room,durationTime,$index,$event)">合</button>
+						{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}} <span style="color: #fff" class="priceColor">(￥{{durationTime.price | number : 0}})</span></div>
+						
+						<div ng-if="durationTime.orderInfo.status == 6 " ng-click="roomDurationInfo(room,durationTime,$index)" class="roomOver">{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}} <span class="priceColor">(￥{{durationTime.price | number : 0}})</span></div>
+
+						<div ng-if="durationTime.orderInfo.status == 7 " ng-click="roomDurationInfo(room,durationTime,$index)" class="roomOver">{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}} <span class="priceColor">(￥{{durationTime.price | number : 0}})</span></div>
+
+
+						<div ng-if="durationTime.orderInfo == undefined || !durationTime.orderInfo" ng-click="roomDurationInfo(room,durationTime,$index)" class="free">
+							<button class="btn btn-primary addDurationBtn" ng-show="(nowTime <= durationTime.end_time || durationTime.begin_time > durationTime.end_time) && !durationTime.mobile && todayTimeStrOrder <= checkDateOrder" ng-click="orderBtn(room,durationTime,$index,$event)">预</button>
+							<button class="btn btn-danger addDurationBtn" ng-show="(nowTime <= durationTime.end_time || durationTime.begin_time > durationTime.end_time) && durationTime.mobile && todayTimeStrOrder <= checkDateOrder" ng-click="orderBtn(room,durationTime,$index,$event)">改</button>
+							{{durationTime.begin_time | turnTime}}-{{durationTime.end_time | turnTime}}
+							<span class="priceColor">(￥{{durationTime.price | number : 0}})</span>
+						</div>
+					</section>
+				</div>
+				
+			</div>
+			<div class="roomWrapFooter">
+				<div><button class="btn btn-primary" ng-click="addRoom()">+新增房间</button></div>
+			</div>
+		</div>
+	</div>
+	<div class="alert alert-success fade in tipBoxDiv" ng-show="tipBox">          
+		<button class="close" type="button" data-dismiss="alert">      
+			<span>×</span>           
+		</button>            
+		<p>             
+			提示：{{tipBoxText}}！            
+		</p>             
+	</div>
+
+
+	<!-- 模态框模板 -->
+    <!--包间详情模态框模板-->
+    <div>
+        <script type="text/ng-template" id="roomDurationInfo.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">包间详情</h4>
+		    </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" name="roomInfoForm" verify-scope>
+                	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">电影名字:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" class="form-control" id=""  ng-model="filmName" disabled>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">价格:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" class="form-control" id=""   ng-model="roomPrice"  disabled>
+					 	</div>
+				 	</div>
+					<div class="form-group">
+						<label for="" class="col-sm-3 control-label">预约人:</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" id=""   ng-model="mobile" disabled>
+						</div>
+					</div>
+				 	<!-- <div class="form-group" ng-if="checkedOrderInfo.status == 3">
+				 		<label for="" class="col-sm-3 control-label">罚金:</label>
+				 		<div class="col-sm-8" ng-if="real_damage == '0.00'">
+					 		<input type="text" class="form-control" id=""  value="" ng-model="real_damage" disabled>
+					 	</div>
+					 	<div class="col-sm-6">
+					 		<input type="text" class="form-control" id=""  value="" ng-model="real_damage">
+					 	</div>
+					 	<div class="col-sm-2">
+							<button class="btn btn-primary" ng-click="setRealDamage()">扣除罚金</button>
+					 	</div>
+				 	</div> -->
+<!-- 				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">预约人姓名:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" class="form-control" id=""  value="宋鹏飞" disabled>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">预约人电话:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" class="form-control" id=""  value="18782468140" disabled>
+					 	</div>
+				 	</div> -->
+					<div>
+				 		<div class="timeChooseWrap" style="overflow: hidden;">
+				 			<div>
+					 			<p class="pull-left">开始</p>
+					 			<p class="pull-left">结束</p>
+					 			<p class="pull-left">价格</p>
+					 		</div>
+					 		<div class="pull-left" uib-timepicker ng-model="editDurationData.begin_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+					 		<div class="pull-left" uib-timepicker ng-model="editDurationData.end_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+							<div class="pull-left col-xs-2">
+								<input type="text" ng-verify="pattern:/^\+?[1-9][0-9]*$/" type="number" class="form-control text-center" ng-model="editDurationData.price">
+							</div>
+							<div class="pull-left col-xs-2">
+								<button class="btn btn-success" ng-click="editDuration()">修改</button>
+							</div>
+				 		</div>
+				 	</div>
+				 	<!--<div class="form-group">-->
+				 		<!--<label for="" class="col-sm-3 control-label">时间段名称:</label>-->
+					 	<!--<div class="col-sm-6">-->
+					 		<!--<input type="text" class="form-control" id="" ng-model="editDurationData.duration_name">-->
+					 	<!--</div>-->
+				 	<!--</div>-->
+				</form>
+            </div>
+        </script>
+    </div>
+
+    <!--点击房间名房间编辑模态框模板-->
+    <div>
+        <script type="text/ng-template" id="editorRoom.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">设置房间
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" name="editorForm" verify-scope>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">房间名称:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" ng-verify="min:1, max:30" class="form-control" id="" ng-model="editorRoomData.room_name">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">房间串号:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" ng-verify="min:1, max:50" class="form-control" id="" ng-model="editorRoomData.room_sn" ng-disabled="true">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">mac地址:</label>
+					 	<div class="col-sm-8">
+					 		<!-- <input type="text" ng-verify="pattern:/^[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}$/,errmsg:'请输入正确的mac地址！'" class="form-control" id="" ng-model="editorRoomData.mac_address"> -->
+					 		<input type="text" class="form-control" id="" ng-model="editorRoomData.mac_address">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">imei编号:</label>
+					 	<div class="col-sm-8">
+							<select class="form-control" ng-model="editorRoomData.imei" ng-verify="min:1, max:100,errmsg:'请选择串号'">
+								<option></option>
+								<option ng-repeat="device in deviceArr" ng-selected="device.imei == editorRoomData.imei">{{device.imei}}</option>
+							</select>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">排序:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" class="form-control" id="" ng-model="editorRoomData.sort">
+					 	</div>
+				 	</div>
+				 	<!-- <div class="form-group">
+				 		<label for="" class="col-sm-2 control-label">更新时间:</label>
+					 	<div class="col-sm-6">
+					 		<input type="text" class="form-control" id="" ng-model="room_max_reserve_day" placeholder="请输入房间更新时间">
+					 	</div>
+					 	<div class="pull-left" style="margin-left: 32px">
+					 		<button class="btn btn-primary" ng-click="changeReserve_day()">修改</button>
+					 	</div>
+				 	</div> -->
+				 	<div class="form-group">
+				  		<label class="col-sm-2 control-label">房间状态:</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+								<label class="i-checks">
+									<input type="radio" checked="checked" name="confirmOrder" ng-model="editorRoomData.status" ng-value="0"><i></i>正常
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="editorRoomData.status" ng-value="1"><i></i>禁用
+								</label>
+							</div>
+					    </div>
+				  	</div>
+				 	<div class="form-group">
+						<label for="" class="col-sm-2 control-label">描述:</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="editorRoomData.info"></textarea> 
+						</div>
+			  		</div>
+					<div class="form-group">
+						<label for="" class="col-sm-2 control-label">包间灯光:</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" ng-model="editorRoomData.mesh_name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="" class="col-sm-2 control-label">包间密码:</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" ng-model="editorRoomData.password">
+						</div>
+					</div>
+			  		<div class="form-group qrcode">
+				 		<label for="inputPassword3" class="col-sm-2 control-label">二维码:</label>
+					 	<div class="col-sm-8">
+					 		<div class="col-sm-9" style="padding: 0;">
+						 		<input type="text" ng-verify="min:1, max:80" class="form-control" id="" ng-model="editorRoomData.qr_code" ng-disabled="qrCodeDis">
+					 		</div>
+					 		<div class="pull-left" style="margin-left: 36px">
+					 			<button class="btn btn-primary" ng-click="changQrCode()">更换</button>
+					 		</div>
+					 		<div class="col-sm-12" style="padding: 0;">
+					 			<a href="javascript:;" class="thumbnail" style="margin-top: 10px">
+									<ng-qrcode qrcode-url="{{editorRoomData.qr_code}}"></ng-qrcode>
+								</a>
+					 		</div>
+						</div>
+				 	</div>
+				 	<div class="panel-group" id="accordion">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<span class="pull-right text-muted">
+								        <i class="fa fa-fw fa-angle-down text"></i>
+								    </span>
+									<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="editDurationClick()">场次编辑</a>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse in animated fadeIn" ng-show="showDurationEdit">
+								<div>
+							 		<div class="timeChooseWrap" style="overflow: hidden;">
+							 			<div>
+								 			<p class="pull-left">开始</p>
+								 			<p class="pull-left">结束</p>
+								 			<p class="pull-left">价格</p>
+								 		</div>
+								 		<div class="pull-left" uib-timepicker ng-model="begin_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+								 		<div class="pull-left" uib-timepicker ng-model="end_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+										<div class="pull-left col-xs-2">
+											<input type="number" class="form-control text-center" ng-model="roomPrice">
+										</div>
+										<div class="pull-left col-xs-2">
+											<button class="btn btn-success" ng-click="addDuration()">添加</button>
+										</div>
+							 		</div>
+									<div class="timeSlot" style="overflow: hidden;">
+										<div class="pull-left" ng-cloak ng-repeat="duration in showTimer">
+											{{ duration.begin_time | turnTime}} - {{ duration.end_time | turnTime}}
+											<button class="close" type="button" ng-click="delDuration(duration,$index)">
+												<span>x</span>
+											</button>
+										</div>
+										<h4 ng-if="showTimer.length == 0" class="text-center">暂无房间数据</h4>
+									</div>
+							 	</div>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<span class="pull-right text-muted">
+								        <i class="fa fa-fw fa-angle-down text"></i>
+								    </span>
+									<a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" ng-click="showUpFileClick()">图片上传</a>
+								</h4>
+							</div>
+							<div id="collapseOne" class="panel-collapse collapse in animated fadeIn" ng-show="showUpFile">
+								<up-file></up-file>
+								<div class="col-xs-12 panel panel-success" style="padding:0">
+									<div class="panel-heading">房间当前图片</div>
+									<div class="panel-body">
+										<img ng-if="currentRoomImg != './img/title/no_has_pic2.gif'" ng-src="{{baseUrl + currentRoomImg}}" alt="当前房间图片" height="120">
+										<img ng-if="currentRoomImg == './img/title/no_has_pic2.gif'" ng-src="{{currentRoomImg}}" alt="当前房间图片" height="120">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-danger pull-left" ng-click="delRoom()">删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+                <button type="button" class="btn btn-primary" ng-click="editorRoomSubmit()">保存</button>  
+            </div> 
+        </script>
+    </div>
+
+    <!--编辑房间模态框模板-->
+    <div>
+        <script type="text/ng-template" id="editorRoomList.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">房间列表</h4>
+		    </div>
+            <div class="modal-body mytable " style="max-height: 500px;overflow-y: scroll;">
+                <table class="table table-responsive table-bordered table-hover">
+                	<thead>
+                		<tr>
+                			<th ng-cloak class="text-center">房间名称</th>
+                			<th ng-cloak class="text-center">房间状态</th>
+                			<th ng-cloak class="text-center">操作</th>
+                		</tr>
+                	</thead>
+                	<tbody>
+                		<tr ng-repeat="room in roomInfo">
+                			<td ng-cloak class="text-center">{{room.room_name}}</td>
+                			<td  ng-cloak class="text-center" ng-if="room.status == 0">空闲</td>
+                			<td  ng-cloak class="text-center" ng-if="room.status == 1">使用</td>
+                			<td  ng-cloak class="text-center clearPadding">
+                				<!--<button class="btn btn-info" ng-click="editorRoom(room)">编辑</button>-->
+                				<button class="btn btn-danger" ng-click="delRoom(room,$index)">删除</button>
+                			</td>
+                		</tr>
+                	</tbody>
+                	<tfoot></tfoot>
+                </table>
+            </div>
+            <!--<div><button class="btn btn-primary" ng-click="addRoom()" style="margin:10px 0 10px 54px">添加房间</button></div>-->
+        </script>
+    </div>
+
+    <!--添加房间模态框模板-->
+    <div>
+        <script type="text/ng-template" id="createRoom.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">添加房间
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+               	<form class="form-horizontal" role="form" name="addForm" verify-scope>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">房间名称:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" ng-verify="min:1, max:30" class="form-control" id="" ng-model="createRoomData.room_name">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">创建人姓名:</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" ng-verify="min:1, max:30" class="form-control" id="" ng-model="createRoomData.create_name">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="inputPassword3" class="col-sm-3 control-label">创建时间:</label>
+					 	<div class="col-sm-8">
+					 		<p class="input-group">
+					          	<input type="text" class="form-control" uib-datepicker-popup ng-model="createRoomData.create_time" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空" id="dateInput"/>
+					          	<span class="input-group-btn">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+		        			</p>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">门锁mac地址:</label>
+					 	<div class="col-sm-8">
+					 		<!-- <input type="text" ng-verify="pattern:/^[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}:[A-Fa-f0-9]{2}$/,errmsg:'请输入正确的mac地址！'" class="form-control" id="" ng-model="createRoomData.mac_address"> -->
+					 		<input type="text" class="form-control" id="" ng-model="createRoomData.mac_address">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">投影串号:</label>
+					 	<div class="col-sm-8">
+							<select class="form-control" ng-verify="min:1, max:100" ng-model="createRoomData.imei" ng-options="x.imei for x in deviceArr">
+								<option></option>
+							</select>
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+						<label for="" class="col-sm-3 control-label">房间描述：</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="createRoomData.info"></textarea> 
+						</div>
+			  		</div>
+					<div class="form-group">
+						<label for="" class="col-sm-3 control-label">包间灯光:</label>
+						<div class="col-sm-8">
+							<input type="text"  class="form-control" id="" ng-model="createRoomData.mesh_name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="" class="col-sm-3 control-label">包间密码:</label>
+						<div class="col-sm-8">
+							<input type="text"  class="form-control" id="" ng-model="createRoomData.password">
+						</div>
+					</div>
+				 	<!--<div class="form-group">-->
+				 		<!--<label for="inputPassword3" class="col-sm-3 control-label">包间灯光:</label>-->
+					 	<!--<div class="col-sm-8">-->
+					 		<!--<select class="form-control">-->
+								<!--<option>打开</option>-->
+								<!--<option>关闭</option>-->
+							<!--</select>-->
+					 	<!--</div>-->
+				 	<!--</div>-->
+				 	<!--<div class="form-group">-->
+				 		<!--<label for="inputPassword3" class="col-sm-3 control-label">包间门锁:</label>-->
+					 	<!--<div class="col-sm-8">-->
+					 		<!--<select class="form-control">-->
+								<!--<option>打开</option>-->
+								<!--<option>关闭</option>-->
+							<!--</select>-->
+					 	<!--</div>-->
+				 	<!--</div>-->
+				 	<!--<div class="form-group">-->
+				 		<!--<label for="inputPassword3" class="col-sm-3 control-label">是否可预约:</label>-->
+					 	<!--<div class="col-sm-8">-->
+					 		<!--<div class="checkbox">-->
+			                  	<!--<label class="i-checks">-->
+			                    	<!--<input type="radio" checked="" name="confirmOrder"><i></i>能预约-->
+			                  	<!--</label>-->
+			                  	<!--<label class="i-checks">-->
+			                    	<!--<input type="radio" name="confirmOrder"><i></i>不可预约-->
+			                  	<!--</label>-->
+			                <!--</div>-->
+					 	<!--</div>-->
+				 	<!--</div>-->
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-default" ng-click="close()">取消</button>
+				<button class="btn btn-primary" ng-click="createRoomSubmit()">保存</button>
+            </div>
+        </script>
+    </div>
+
+	<!--消费记录模态框模板-->
+	<div>
+        <script type="text/ng-template" id="roomRecord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">消费记录</h4>
+		    </div>
+            <div class="modal-body">
+                <table class="table table-responsive table-bordered table-hover roomRecord">
+                	<thead>
+                		<tr>
+                			<th  ng-cloak class="text-center sorting_asc">序号 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">包间 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">时段 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">电影 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">手机号 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">订单价格 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">实际付款 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">支付类型 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">是否到店 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">评分 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">建议罚款 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">赔偿图片 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">实际罚款 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">状态 <span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">操作 <span class="footable-sort-indicator"></span></th>
+                		</tr>
+                	</thead>
+                	<tbody>
+                		<tr ng-repeat="order in showOrderListData">
+                			<td ng-cloak class="text-center sorting_asc">{{$index + 1}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.info.room_name}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.info.duration_time}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.info.film_name}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.info.mobile}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.price}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.pay_price}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.pay_type | payTypeStatus}}</td>
+                			<td ng-cloak class="text-center sorting_asc" ng-if="order.status == 1 || order.status == 6">未到</td>
+                			<td ng-cloak class="text-center sorting_asc" ng-if="order.status != 1 && order.status != 6">已到</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.grade}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{order.damage}}</td>
+                			<td ng-cloak class="text-center sorting_asc" ng-if="order.damage_image_urls == ''">
+                				无
+                			</td>
+                			<td ng-cloak class="text-center sorting_asc" ng-if="order.damage_image_urls != ''">
+                				<a ng-click="openLightboxModal(order)" class="btn btn-primary small">查看</a>
+                			</td>
+                			<td ng-cloak class="text-center sorting_asc">
+                				<section ng-show="!order.setRealDamageFlag">{{order.real_damage | number : 2}} <button class="btn btn-primary small pull-right" style="margin-top: 0px;" ng-click="showSetRealDamage(order,$index)" ng-if="order.is_set_damage == 0 && order.damage > 0">设置</button></section>
+                				<section ng-show="order.setRealDamageFlag">
+                					<input type="text" class="form-control pull-left realDamageInput" id="" ng-model="order.newReal_damage" style="width:60px;">
+                					<button class="btn btn-info small pull-right" style="margin-left: 2px" ng-click="return()">返回</button>
+                					<button class="btn btn-danger small pull-right" ng-click="changeRealDamage(order)">修改</button>
+                				</section>
+                			</td>
+							<td ng-cloak class="text-center sorting_asc" ng-if="order.status != 1 && order.status != 2">已过期</td>
+                			<td ng-cloak class="text-center sorting_asc" ng-if="order.status == 1 || order.status == 2">未过期</td>
+                			<td ng-cloak class="text-center sorting_asc">
+                				<button ng-if="order.getOutTime > 0" class="btn btn-primary small" ng-click="refundOrder(order,$index)">退单</button>
+                				<!-- <button ng-if="order.getOutTime > 0" class="btn btn-primary small" ng-click="refundOrder(order,$index)" disabled="true">退单</button> -->
+                				<button ng-if="order.getOutTime <= 0" class="btn btn-primary small" ng-click="refundOrder(order,$index)" disabled="true">退单</button>
+                				<!-- <button ng-if="order.getOutTime <= 0" class="btn btn-primary small" ng-click="refundOrder(order,$index)" disabled="true">退单</button> -->
+                			</td>
+                			<!-- <td ng-cloak class="text-center sorting_asc" ng-click="" ng-if="order.status != 1">无</td> -->
+
+                			
+                		</tr>
+                	</tbody>
+                </table>
+                <div class="userListPag">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" items-per-page="maxPageSize"></ul>
+					<div class="pull-left">
+						<input type="text" ng-model="reqPage">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div>	
+            </div>
+        </script>
+    </div>
+    <!--打扫记录模态框模板-->
+	<div>
+        <script type="text/ng-template" id="clearReord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">打扫记录</h4>
+		    </div>
+            <div class="modal-body">
+                <table class="table table-responsive table-bordered table-hover">
+                	<thead>
+                		<tr>
+                			<th  ng-cloak class="text-center sorting_asc">打扫时间<span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">打扫人员<span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">打扫房间<span class="footable-sort-indicator"></span></th>
+                			<th  ng-cloak class="text-center sorting_asc">打扫时段<span class="footable-sort-indicator"></span></th>
+                		</tr>
+                	</thead>
+                	<tbody>
+                		<!--<tr ng-if="clearReords.length == 0">-->
+                			<!--<td ng-cloak class="text-center sorting_asc">暂无记录</td>-->
+                			<!--<td ng-cloak class="text-center sorting_asc">暂无记录</td>-->
+                			<!--<td ng-cloak class="text-center sorting_asc">暂无记录</td>-->
+                		<!--</tr>-->
+                		<tr ng-repeat="clearReord in clearReords" ng-if="clearReord.status == 3">
+                			<td ng-cloak class="text-center sorting_asc">{{clearReord.finish_time | turnDateHMS}} </td>
+                			<td ng-cloak class="text-center sorting_asc">{{clearReord.staff_name}} </td>
+                			<td ng-cloak class="text-center sorting_asc">{{clearReord.info.room_name}}</td>
+                			<td ng-cloak class="text-center sorting_asc">{{clearReord.info.duration_time}}</td>
+                		<tr>
+                	</tbody>
+                	<tfoot></tfoot>
+                </table>
+            </div>
+        </script>
+    </div>
+     <!--设置罚款模态框模板-->
+	<div>
+        <script type="text/ng-template" id="changeRealDamage.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">设置罚款
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+               	<form class="form-horizontal" role="form" name="addForm" verify-scope>
+				 	<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">罚款金额：</label>
+					 	<div class="col-sm-8">
+					 		<input type="text" ng-verify="min:1, max:30" class="form-control" id="" ng-model="changeRealDamageData.newReal_damage">
+					 	</div>
+				 	</div>
+				 	<div class="form-group">
+						<label for="" class="col-sm-3 control-label">罚款说明：</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="changeRealDamageData.damage_info" placeholder="请输入具体的罚款文字说明！"></textarea> 
+						</div>
+			  		</div>
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-default" ng-click="close()">取消</button>
+				<button class="btn btn-primary" ng-click="changeRealDamage()">保存</button>
+            </div>
+        </script>
+    </div>
+
+    <!-- 预约模板 -->
+    <div>
+        <script type="text/ng-template" id="order.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">提前预约</h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" role="form" name="roomInfoForm">
+					<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">预约手机号:</label>
+					 	<div class="pull-left w-200">
+					 		<input type="text" class="form-control" id="" ng-model="mobile" placeholder="请输入预约的手机号码！">
+					 	</div>
+					 	<div class="pull-left tem-model-btn">
+					 		<button class="btn btn-primary" ng-click="subOrderBtn()">提交</button>
+					 	</div>
+				 	</div>
+				</form>
+            </div>
+        </script>
+    </div>
+</div>

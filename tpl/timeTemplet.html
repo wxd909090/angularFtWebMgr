@@ -1,0 +1,250 @@
+<div class="pt_36  text-center font16" style="margin-top:20px">
+	<div class="animated fadeIn mytable" >
+		<form class="form-horizontal"  name="addForm" verify-scope>
+			<div class="form-group">
+				<label for="inputEmail3" class="control-label templetLabel">模板天数：</label>
+				<div class="col-sm-8">
+					<div class="input-group pull-left startTime">
+		              	<input type="text" class="form-control" ng-model="storeMaxCopyTime">
+		            </div>
+		            <div class="pull-left text-left">
+						<button class="btn btn-primary" ng-click="setStoreMaxCopyTime()">修改</button>
+					</div>
+				</div>
+	  		</div>
+			<div class="form-group has-feedback">
+				<label for="inputEmail3" class="control-label templetLabel">模板名称：</label>
+				<div class="col-sm-2">
+					<select class="form-control" ng-model="temType" ng-change="changeType()" id="typeSelect">
+						<option value="{{type.type}}" ng-model="type.template_name" ng-repeat="type in typeArr track by $index" ng-selected="type.type == 0">{{type.template_name}}</option>
+					</select>
+				</div>
+				<div class="pull-left text-left" ng-show="temType == 2">
+					<button class="btn btn-primary" ng-click="deleteTemplate()">删除模板</button>
+				</div>
+				<div class="col-sm-3 text-left">
+					<button class="btn btn-primary" ng-click="addDateType()">添加模板</button>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="inputEmail3" class="control-label templetLabel">适用日期：</label>
+				<div class="col-sm-8 text-left normal-day" ng-show="temType == 0">
+					<label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期一
+		            </label>
+		            <label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期二
+		            </label>
+		            <label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期三
+		            </label>
+		            <label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期四
+		            </label>
+		            <label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期五
+		            </label>
+				</div>
+				<div class="col-sm-8 text-left week-day" ng-show="temType == 1">
+					<label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期六
+		            </label>
+		            <label class="checkbox-inline i-checks">
+		              	<input type="checkbox" ng-model="option1"><i></i> 星期日
+		            </label>
+				</div>
+				<div  class="col-sm-8 text-left normal-day" ng-if="temType == 2">
+					<p style="width: 190px;margin-right: 20px" class="input-group pull-left">
+			          	<input type="text" class="form-control" uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" />
+			          	<span class="input-group-btn">
+			            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</p>
+					<div class="pull-left">
+						<button class="btn btn-primary" ng-click="addTypeDate()">添加</button>
+					</div>
+					<div class="clear-both">
+						<div class="input-group pull-left user-time" ng-repeat="typeDate in showDateTypeArr">
+			              	<span>{{typeDate | turnDateMD}}</span>
+		              		<span class="input-group-btn">
+		                		<button class="btn btn-default" type="button" ng-click="deleteApply_time(showDateTypeArr,$index)">X</button>
+		              		</span>
+			            </div>
+					</div>
+				</div>
+			    
+	  		</div>
+<!-- 	  		<div class="form-group">
+				<label for="inputEmail3" class="control-label templetLabel">开始时间：</label>
+				<div class="col-sm-8">
+					<div class="input-group pull-left startTime">
+		              	<input type="text" class="form-control" ng-model="storeStartTime">
+		            </div>
+		            <div class="pull-left templetInline">
+		            	<div class="pull-left">打烊时间</div>
+		            	<div class="input-group pull-left templetInputWrap">
+			              	<input type="text" class="form-control" placeholder="" ng-model="storeEndTime">
+			            </div>
+		            </div>
+		            <div class="pull-left templetInline">
+		            	<div class="pull-left">错场时间</div>
+		            	<div class="input-group pull-left templetInputWrap">
+			              	<input type="text" class="form-control" placeholder="" ng-model="spaceTime">
+			            </div>
+		            </div>
+				</div>
+	  		</div> -->
+	  		<div class="form-group">
+				<label for="inputEmail3" class="control-label templetLabel">营业时间：</label>
+				<div class="col-sm-8">
+					<div class="input-group pull-left startTime">
+		            	<div class="timerTitle">开始时间</div>
+						<div uib-timepicker ng-model="begin_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+		            </div>
+		            <div class="input-group pull-left startTime">
+		            	<div class="timerTitle">结束时间</div>
+						<div uib-timepicker ng-model="end_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+		            </div>
+
+		        </div>
+	  		</div>
+	  		<div class="form-group">
+				<label for="inputEmail3" class="control-label templetLabel">单场时间：</label>
+				<div class="col-sm-8">
+					<div class="input-group pull-left startTime" style="margin-right: 0">
+		              	<input type="text" class="form-control" ng-model="durationMin">
+		            </div>
+		            <div class="pull-left" style="line-height: 34px">分钟</div>
+		            <div class="pull-left templetInline">
+		            	<div class="pull-left">包间价格</div>
+		            	<div class="input-group pull-left templetInputWrap">
+			              	<input type="text" class="form-control" ng-model="price">
+			            </div>
+			            <div class="pull-left" style="line-height: 34px">元</div>
+		            </div>
+		            <div class="pull-left templetInline">
+		            	<div class="pull-left">错场时间</div>
+		            	<div class="input-group pull-left templetInputWrap">
+			              	<input type="text" class="form-control" placeholder="" ng-model="spaceTime">
+			            </div>
+			            <div class="pull-left" style="line-height: 34px">分钟</div>
+		            </div>
+		            <div class="pull-left m-l-50">
+		            	<button class="btn btn-primary" ng-click="produceDuration()">一键生成</button>
+		            	<button class="btn btn-primary" ng-click="submitTemData()">保存</button>
+		            	<!-- <button class="btn btn-primary" ng-click="applyTemplate()">应用</button> -->
+		            	<button class="btn btn-primary" ng-click="goback()">返回房间</button>
+		            </div>
+		        </div>
+	  		</div>
+		</form>
+		<div class="tem-room-wrap" ng-show="showDurationFlag">
+			<div class="tem-room" ng-repeat="duration in durationArr" ng-init="roomIndex = $index">
+				<div class="tem-room-title">
+					<h5 class="pull-left tem-room-name">{{duration.room_name}}</h5>
+					<button class="btn btn-primary pull-right tem-add-duration" ng-click="addDurationTime(roomIndex,duration)">添加</button>
+				</div>
+				<div class="tem-durations-wrap">
+					<div class="tem-duration-time" ng-repeat="time in duration.durationTime">
+						<div class="pull-left duration-wrap-left" ng-click="changeDurationTime(roomIndex,$index,time)">
+							<span>{{time.begin_time | turnTime}}</span>
+								-
+							<span>{{time.end_time | turnTime}}</span>
+							<span  class="delete-duration-btn"><a href="" ng-click="deleteDuration(roomIndex,$index)">X</a></span>
+						</div>
+						<div class="pull-left priceInput">
+							<input type="text" class="form-control" ng-model="time.price">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+
+    <!-- 自定义模板 -->
+    <div>
+        <script type="text/ng-template" id="addDateType.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">自定义模板</h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" role="form" name="roomInfoForm">
+					<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">模板名称:</label>
+					 	<div class="pull-left w-200">
+					 		<input type="text" class="form-control" id="" ng-model="newDateType" placeholder="请输入模板名称！">
+					 	</div>
+					 	<div class="pull-left tem-model-btn">
+					 		<button class="btn btn-primary" ng-click="addDateType()">添加</button>
+					 	</div>
+				 	</div>
+				</form>
+            </div>
+        </script>
+    </div>
+    <!-- 时段编辑模板 -->
+    <div>
+        <script type="text/ng-template" id="durationTem.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">时段编辑</h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" role="form" name="roomInfoForm">
+					<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">房间时段:</label>
+					 	<div class="pull-left w-200">
+					 		<input type="text" class="form-control" id="" ng-model="showTime">
+					 	</div>
+					 	<div class="pull-left tem-model-btn">
+					 		<button class="btn btn-primary" ng-click="subChangeDurationTime(showTime)">修改</button>
+					 	</div>
+				 	</div>
+				</form>
+            </div>
+        </script>
+    </div>
+
+    <!-- 时段添加模板 -->
+    <div>
+        <script type="text/ng-template" id="addDurationTem.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">时段添加</h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" role="form" name="roomInfoForm">
+					<div class="form-group">
+						<label for="inputEmail3" class="control-label templetLabel">营业时间：</label>
+						<div class="col-sm-8">
+							<div class="input-group pull-left startTime">
+				            	<div class="timerTitle text-center">开始时间</div>
+								<div uib-timepicker ng-model="begin_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+				            </div>
+				            <div class="input-group pull-left startTime">
+				            	<div class="timerTitle text-center">结束时间</div>
+								<div uib-timepicker ng-model="end_time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+				            </div>
+
+				        </div>
+			  		</div>
+<!-- 					<div class="form-group">
+				 		<label for="" class="col-sm-3 control-label">房间时段:</label>
+					 	<div class="pull-left w-200">
+					 		<input type="text" class="form-control" id="" ng-model="showAddTime" placeholder="8:00-10:00">
+					 	</div>
+				 	</div> -->
+				 	<div class="form-group">
+				 		<label for="inputEmail3" class="control-label templetLabel">房间价格：</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control pull-left" id="" ng-model="showAddPrice" placeholder="" style="width: 40%">
+							<div class="pull-left line-h-34 m-l-sm">元</div>
+				        </div>
+				 	</div>
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-default" ng-click="close()">取消</button>
+				<button class="btn btn-primary" ng-click="addDurationTime()">添加</button>
+            </div>
+        </script>
+    </div>
+</div>

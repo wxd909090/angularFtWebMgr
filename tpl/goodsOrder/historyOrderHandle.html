@@ -1,0 +1,121 @@
+<div class="historyOrderHandleWrap">
+	<!-- 历史订单 -->
+	<!-- <div class="my-page-header clear">
+		<div class="pull-left">历史订单</div>
+	</div> -->
+	<div class="my-page-header clear">
+		<div class="pull-left">选择门店</div>
+		<div class="pull-left m-l">
+			<select ng-model="store" class="form-control w-200 inline" ng-options="store.store_name for store in storeListData" ng-change="changeStore(store)"></select>
+		</div>
+	</div>
+	<!-- 时间插件 -->
+	<div class="m-t-md m-l-xl">
+		<form class="form-inline">
+		  	<div class="form-group">
+		 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+          			<input type="text" class="form-control" uib-datepicker-popup ng-model="start_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+		          	<span class="input-group-btn">
+		            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+		          	</span>
+				</p>
+		 	</div>
+			<div class="form-group">—</div>
+		 	<div class="form-group">
+		 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+          			<input type="text" class="form-control" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+		          	<span class="input-group-btn">
+		            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+		          	</span>
+				</p>
+		 	</div>
+		 	<div class="form-group">
+				<div class="input-group">
+					<input type="text" ng-model="phoneNumber" class="form-control input-sm bg-light no-border rounded padder" placeholder="搜索手机号">
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-sm bg-light rounded" ng-click="serachUser()"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+		</form>
+	</div>
+	<!-- 表格 -->
+	<div class="historyOrderTableBox m-t-md p-40-o">
+		<table class="table table-responsive table-bordered table-hover" style="margin:0 auto">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center">订单编号</th>
+		            <th ng-cloak class="text-center">用户</th>
+		            <th ng-cloak class="text-center">包间/时段</th>
+		            <th ng-cloak class="text-center">订单金额</th>
+		            <th ng-cloak class="text-center">支付日期</th>
+		            <th ng-cloak class="text-center">配送方式</th>
+		            <th ng-cloak class="text-center">配送(退单)时间</th>
+		            <th ng-cloak class="text-center">状态</th>
+		            <th ng-cloak class="text-center">商品</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    	<tr ng-repeat="goodsOrder in goodsOrderData">
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.go_sn}}</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.info.mobile}}</td>
+	    			<td ng-clock class="text-center">
+	    				<p>{{goodsOrder.ft_order.info.room_name}}</p>
+	    				<p>{{goodsOrder.ft_order.reserve_time | turnDateYMD}}</p>
+	    				<p>{{goodsOrder.ft_order.info.duration_time}}</p>
+	    			</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.pay_type | payMethod}} ￥{{goodsOrder.ft_order.price}}优惠￥{{goodsOrder.ft_order.free_price}}</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.pay_record[0].pay_time | turnYMDHMS}}</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.distribution_type | distributionMethod}}</td>
+	    			<td ng-clock class="text-center">{{goodsOrder.ft_order.reserve_time | turnDateYMD}} {{goodsOrder.ft_order.info.duration_time}}</td>
+	    			<!-- <td ng-clock class="text-center">{{goodsOrder.status}}{{goodsOrder.pay_record[0].status | turnState}}</td> -->
+	    			<td ng-clock class="text-center">{{goodsOrder.status | turnState}}</td>
+		    		<td ng-clock class="text-center clearPadding">
+						<a class="btn btn-text" ng-click="checkHistoryOrder(goodsOrder)">查看</a>
+		    		</td>
+		    	</tr>
+		    </tbody>
+		</table>
+	</div>
+
+</div>
+<!--历史订单查看模态框模板-->
+<div>
+    <script type="text/ng-template" id="checkHistoryOrder.html">
+    	<div class="modal-header">
+	        <h4 class="modal-title text-center">{{seeName}}
+				<button type="button" class="close" ng-click="close()">
+			 		<span aria-hidden="true">&times;</span>
+			 		<span class="sr-only">Close</span>
+				</button>
+	        </h4>
+	    </div>
+        <div class="modal-body goodsOrderInfoWrap">
+			<p>订单用户：<span>{{seePhoneNumber}}</span></p>
+			<p>配送包间：<span>{{seePrivateRoom}}</span></p>
+			<p>配送时段：<span>{{seeDay | turnDateYMD}} {{seeDeliveryTime}}</span></p>
+			<p>配送方式：<span>{{goodsOrder.ft_order.distribution_type | distributionMethod}}</span></p>
+			<table class="table table-responsive table-bordered table-hover">
+				<thead>
+			        <tr>
+			            <th ng-cloak class="text-center">商品名称</th>
+			            <th ng-cloak class="text-center">数量</th>
+			            <th ng-cloak class="text-center">单价</th>
+			        </tr>
+			    </thead>
+				<tbody>
+					<tr ng-repeat="orderGoods in seeOrderGoods">
+						<td ng-cloak class="text-center">{{orderGoods.name}}</td>
+						<td ng-cloak class="text-center">{{orderGoods.total_amount}}</td>
+						<td ng-cloak class="text-center">￥{{orderGoods.price}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<p class="goodsOrderPirceText">
+				<span>订单金额：￥{{seeAllMoney}}</span>
+				<span>优惠：{{seeFreeMoney}}</span>
+				<span>实付￥{{seePayMoney}}</span>
+			</p>
+        </div>
+    </script>
+</div>

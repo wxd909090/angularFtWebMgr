@@ -1,0 +1,85 @@
+
+
+<div class="pt_36  text-center font16" style="margin-top:10px">
+	<!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable" style="padding: 0 15px">
+		<div class="userAssess col-lg-10 col-md-12">
+			<div class="userAssessHeader">
+				<div class="btn-group">
+					<!-- <label ng-class="checkModel1" btn-checkbox ng-click="clickTable(1)">门店统计</label> -->
+					<!-- <label ng-class="checkModel2" btn-checkbox ng-click="clickTable(2)">结算记录</label> -->
+				</div>
+			</div>
+			<div class="userAssessContent" ng-show="checkModel1 == 'btn btn-default active'">
+				<div class="panel panel-default">
+					<!-- 时间 -->
+					<!-- 时间插件 -->
+					<div class="panel-heading font-bold">
+						统计
+					</div>
+					<div class="panel-body">
+						<div class="m-t-md ">
+							<button class="btn btn-primary pull-left" ng-click="getTodayData()">当天</button>
+							<form class="form-inline pull-left">
+							  	<div class="form-group">
+							 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+					          			<input type="text" class="form-control" uib-datepicker-popup ng-model="start_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+							          	<span class="input-group-btn">
+							            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+							          	</span>
+									</p>
+							 	</div>
+								<div class="form-group">—</div>
+							 	<div class="form-group">
+							 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+					          			<input  type="text" class="form-control" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+							          	<span class="input-group-btn">
+							            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+							          	</span>
+									</p>
+							 	</div>
+							</form>
+						</div>
+						<form class="form-inline userAssessForm">
+						</form>
+						<table class="table table-responsive table-bordered table-hover userAssessTable">
+							<thead>
+							<tr>
+								<th ng-cloak class="text-center">门店</th>
+								<th ng-cloak class="text-center">总金额</th>
+								<th ng-cloak class="text-center">微信</th>
+								<th ng-cloak class="text-center">会员卡</th>
+								<th ng-cloak class="text-center">电影-商品</th>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr ng-repeat="store in bigBusinessData">
+								
+								<td ng-cloak class="text-center">{{store.store_name}}</td>
+								<td ng-cloak class="text-center">{{store.total_price}}</td>
+								<td ng-cloak class="text-center">{{store.wx_price}}</td>
+								<td ng-cloak class="text-center">{{store.member_price}}</td>
+								<td ng-cloak class="text-center">{{store.m_num}}-{{store.g_num}}</td>
+							</tr>
+							</tbody>
+						</table>
+						<div style="position: relative;overflow: hidden" ng-show="allTotalPage">
+							<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+							<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+								<input type="text" ng-model="reqPage" style="width: 36px">
+								<button type="button" ng-click="setPage()" >跳转</button>
+								最大页数: {{maxPage}} 页
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+

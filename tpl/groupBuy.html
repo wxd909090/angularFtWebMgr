@@ -1,0 +1,105 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 --> 
+<div class="pt_36  text-center font16" style="margin-top:20px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn text-left">
+		<form class="form-inline m-l-20">
+		  	<div class="form-group">
+		    	<p class="form-control-static">使用状态：</p>
+		 		<select class="form-control text-left" ng-model="isUsed">
+		 			<option value=""  ng-selected="true">全部</option>
+		 			<option value="0">未使用</option>
+		 			<option value="1">已使用</option>
+		 		</select>
+		  	</div>
+		  	<div class="form-group m-l-20">
+		    	<p class="form-control-static">团购码：</p>
+		    	<input type="text" class="form-control" id="" ng-model="code" placeholder="请输入团购码">
+		  	</div>
+		  	<div class="form-group m-l-20">
+		    	<p class="form-control-static">手机号码：</p>
+		    	<input type="text" class="form-control" id="" ng-model="mobile" placeholder="请输入手机号码">
+		  	</div>
+		  	<div class="form-group">
+		  		<p class="form-control-static">使用日期：</p>
+		 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+          			<input type="text" class="form-control" uib-datepicker-popup ng-model="useTime" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput"/>
+		          	<span class="input-group-btn">
+		            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+		          	</span>
+				</p>
+		 	</div>
+		  	<button type="button" class="btn btn-primary m-l-20" ng-click="searchBtn()">搜索</button>
+		  	<button type="button" class="btn btn-primary m-l-20" ng-click="emptySearch()">清空</button>
+		</form>
+        <table class="table table-responsive table-bordered table-hover m-t-md" style="margin-bottom: 5px">
+        	<thead>
+        		<tr>
+        			<th ng-cloak class="text-center" style="width:50px">
+        				<label class="checkbox-inline i-checks">
+			              	<input type="checkbox" ng-model="option1" ng-click="checkAllChoose()"><i></i>
+			            </label>
+        			</th>
+        			<th ng-cloak class="text-center" style="width:80px">序号</th>
+        			<th ng-cloak class="text-center">团购码</th>
+        			<th ng-cloak class="text-center">价格</th>
+        			<th ng-cloak class="text-center">状态</th>
+        			<th ng-cloak class="text-center">使用者</th>
+        			<th ng-cloak class="text-center">使用时间</th>
+        			<th ng-cloak class="text-center">创建时间</th>
+        			<th ng-cloak class="text-center">过期时间</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr ng-repeat="groupBuy in groupBuyList">
+        			<td ng-cloak class="text-center">
+        				<label class="checkbox-inline i-checks">
+			              	<input type="checkbox" ng-model="groupBuy.checked"><i></i>
+			            </label>
+			        </td>
+        			<td ng-cloak class="text-center">{{$index + 1}}</td>
+        			<td ng-cloak class="text-center">{{groupBuy.code}}</td>
+        			<td ng-cloak class="text-center">{{groupBuy.price}}</td>
+        			<td ng-cloak class="text-center formalStaff" ng-if="groupBuy.is_used == 1">{{groupBuy.is_used | codeStatus}}</td>
+		    		<td ng-cloak class="text-center normalStaff" ng-if="groupBuy.is_used == 0">{{groupBuy.is_used | codeStatus}}</td>
+        			<td ng-cloak class="text-center">{{groupBuy.user_info.mobile}}  {{groupBuy.user_info.nick_name}}</td>
+        			<td ng-cloak class="text-center">{{groupBuy.use_time | turnDateHMS}}</td>
+        			<td ng-cloak class="text-center">{{groupBuy.create_time | turnDateYMD}}</td>
+        			<td ng-cloak class="text-center">{{groupBuy.expire_time | turnDateYMD}}</td>
+        		</tr>
+        	</tbody>
+        	<tfoot></tfoot>
+        </table>
+        <div class="group-buy-btns m-l-20" style="position: absolute;left: 200px;top;height: 70px;line-height: 70px;z-index: 99">
+    		<button class="btn btn-primary" ng-click="addGroupBuy()">添加</button>
+    		<button class="btn btn-danger" ng-click="delGroupBuy()">删除</button>
+    	</div>
+        <div style="position: relative;overflow: hidden;">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>	
+	</div>
+	<!--添加团购码模态框模板-->
+	<div>
+        <script type="text/ng-template" id="addGroupBuy.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">添加团购码</h4>
+		    </div>
+            <div class="modal-body">
+                <form class="form-inline m-l-20">
+				  	<div class="form-group">
+				    	<p class="form-control-static">团购码数量：</p>
+		    			<input type="text" class="form-control" id="" ng-model="codeNum" placeholder="请输入生成团购码的数量">
+				  	</div>
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-default" ng-click="close()">取消</button>
+				<button class="btn btn-primary" ng-click="createGroupBuyCodeSub()">生成</button>
+            </div>
+        </script>
+    </div>
+</div>

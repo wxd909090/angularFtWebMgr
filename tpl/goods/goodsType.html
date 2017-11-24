@@ -1,0 +1,108 @@
+<div class="goodsTypeWrap">
+	<div class="my-page-header clear">
+		<div class="pull-left">选择门店</div>
+		<div class="pull-left m-l">
+			<select ng-model="store" class="form-control w-200 inline" ng-options="store.store_name for store in storeListData" ng-change="changeStore()"></select>
+		</div>
+		<div class="pull-right">
+			<button class="btn btn-primary" ng-click="goodsTypeCreateGoods()">+新建商品</button>
+			<button class="btn btn-primary" ng-click="goodsTypeCreateGoodsType()">+新建商品分类</button>
+		</div>
+	</div>
+	<div class="goodsTypeWrapBottom clear-both clear">
+		<div class="m-t-md">
+		  	<div>
+	  			<div class="table-header">
+					<div class="flex-2 text-center">商品分类名称</div>
+					<div class="flex-2 text-center">出售中商品</div>
+					<div class="flex-2 text-center">下架中商品</div>
+					<div class="flex-3 text-center text-indent-20">商品标签</div>
+					<div class="flex-4 text-center">操作</div>
+				</div>
+				<div class="table-header">
+					<div class="flex-2 text-center">*热销</div>
+					<div class="flex-2 text-center">{{hotGoodsNormal}}</div>
+					<div class="flex-2 text-center">{{hotGoodsNotBuy}}</div>
+					<div class="flex-3 text-center text-indent-20">销量最高</div>
+					<div class="flex-4 text-center">
+						
+					</div>
+				</div>
+				<div class="table-body" ng-sortable="$ctrl.sortableConf">
+					<div ng-repeat="goodsType in goodsTypes" class="goodsTypeTableTd">
+						<div class="flex-2 text-center">{{goodsType.name}}</div>
+						<div class="flex-2 text-center">{{goodsType.goodsNormal}}</div>
+						<div class="flex-2 text-center">{{goodsType.goodsNotBuy}}</div>
+						<div class="flex-3 text-center text-indent-20">
+							<span ng-repeat="item in goodsType.tag">
+								{{item.name}} <span ng-show="$index < (goodsType.tag.length-1)">、</span>
+							</span>
+						</div>
+						<div class="flex-4 text-center">
+							<button class="btn btn-primary" ng-click="editGoodsType(goodsType)">修改</button>
+							<button class="btn btn-primary" ng-click="delGoodsType(goodsType)">删除</button>
+						</div>
+					</div>
+				</div>
+		  	</div>
+		  	<p style="margin-top: 10px;color: #999">*热销类不能删除和编辑,商品可在其他类显示也可以在热销类显示,上下拖动分类可以修改分类在小程序中的显示顺序</p>
+		  	<!-- 分页设置 -->
+			<div style="position: relative;overflow: hidden">
+				<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+				<div class="pull-left" style="margin-top: 23px;margin-left: 20px">
+					<input type="text" ng-model="reqPage" style="width: 36px">
+					<button type="button" ng-click="setPage()" >跳转</button>
+					最大页数: {{maxPage}} 页
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--编辑分类模态框模板-->
+	<div>
+	    <script type="text/ng-template" id="editGoodsType.html">
+	    	<div class="modal-header">
+		        <h4 class="modal-title text-center">编辑商品分类
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+	        <div class="modal-body">
+				<form class="form-horizontal" name="" verify-scope>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">商品分类名称:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="goodsTypeData.name" placeholder="输入商品名称">
+					    </div>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="inputPassword" class="col-sm-3 control-label">商品标签:</label>
+					    <div class="col-sm-8">
+					    	<div class="row m-n">
+					    		<div class="col-xs-9 p-0">
+								    <input type="input" ng-verify="min:1, max:100" class="form-control" ng-model="addTag" placeholder="输入商品标签">
+					    		</div>
+								<div class="col-xs-2 p-0 m-l-sm">
+									<button class="btn btn-primary" ng-click="addTagClick()">添加标签</button>
+								</div>
+					    	</div>
+					      	<div class="row" style="margin:10px 0 0 0">
+					      		<ul class="list-group text-center administrorUl">
+					      			<li class="list-group-item text-left" ng-repeat="item in goodsTypeData.tag" class="text-left">
+					      				{{ $index+1 }} . {{item.name}} 
+					      				<button class="btn btn-danger btn-circle m-l pull-right" style="margin-top:-7px" ng-click="removeTag($index)">删除</button>
+					      			</li>
+								</ul>
+					      	</div>
+					    </div>
+				  	</div>
+				</form>				
+	        </div>
+	        <div class="modal-footer">  
+	            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+	            <button type="button" class="btn btn-primary" ng-click="editGoodsTypeSub()">修改</button>  
+	        </div> 
+	    </script>
+	</div>
+</div>

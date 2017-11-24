@@ -1,0 +1,139 @@
+<div class="pt_36  text-center font16" style="margin-top:10px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable" style="padding: 0 15px;">
+		<div class="text-left">
+			<button class="btn btn-primary" ng-click="addVideo()">新增</button>
+		</div>
+		<table class="table table-responsive table-bordered table-hover m-t-sm filmTable">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center w-100">期数</th>
+		            <th ng-cloak class="text-center w-150">开始日期</th>
+		            <th ng-cloak class="text-center w-150">截止日期</th>
+		            <th ng-cloak class="text-left text-indent-20">链接</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+				<tr ng-repeat="filmXf in filmXfList">	
+					<td ng-cloak class="text-center p-0">
+						<a href="javascript:;" ng-click="editVideo(filmXf)">{{filmXf.issue}}</a>
+					</td>
+					<td ng-cloak class="text-center p-0">{{filmXf.begin_time | turnDateYMD}}</td>
+					<td ng-cloak class="text-center p-0">{{filmXf.end_time | turnDateYMD}}</td>
+					<td ng-cloak class="text-left p-0 text-indent-20">{{filmXf.url}}</td>
+				</tr>
+		    </tbody>
+		</table>
+		<div style="position: relative;overflow: hidden">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+			<div class="pull-left m-t-md m-l-md">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>	
+	</div>
+	<!--电影先锋模态框模板-->
+	<div>
+		<script type="text/ng-template" id="addVideo.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">新增电影先锋
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" name="filmAddForm" verify-scope>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">期数:</label>
+					    <div class="col-sm-3">
+					    	<input type="number" class="form-control" name="points" min="1" max="500" ng-model="issue"/>
+					    </div>
+				  	</div>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">开始时间:</label>
+				    	<div class="col-sm-6">
+					    	<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="begin_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" style="width:85%" />
+					          	<span class="input-group-btn pull-left">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+					    </div>
+					</div>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">截止时间:</label>
+				    	<div class="col-sm-6">
+					    	<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions2" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput2" ng-change="checkDateChange(checkDate)" style="width:85%" />
+					          	<span class="input-group-btn pull-left">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+					    </div>
+					</div>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">视频链接:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="min:1, max:5000" class="form-control" ng-model="url" placeholder="输入视频链接">
+					    </div>
+				  	</div>
+				</form>		
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="addVideoSub()">添加</button>
+			</div>
+		</script>
+	</div>
+
+	<!--编辑电影先锋模态框模板-->
+	<div>
+		<script type="text/ng-template" id="editVideo.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">编辑电影先锋
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" name="filmAddForm" verify-scope>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">期数:</label>
+					    <div class="col-sm-3">
+					    	<input type="number" readonly class="form-control" name="points" min="1" max="500" ng-model="editVideoData.issue"/>
+					    </div>
+				  	</div>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">开始时间:</label>
+				    	<div class="col-sm-6">
+					    	<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="editVideoData.begin_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" style="width:85%" />
+					          	<span class="input-group-btn pull-left">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+					    </div>
+					</div>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">截止时间:</label>
+				    	<div class="col-sm-6">
+					    	<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="editVideoData.end_time" is-open="popup2.opened" datepicker-options="dateOptions2" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput2" ng-change="checkDateChange(checkDate)" style="width:85%" />
+					          	<span class="input-group-btn pull-left">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+					    </div>
+					</div>
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">视频链接:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="min:1, max:5000" class="form-control" ng-model="editVideoData.url" placeholder="输入视频链接">
+					    </div>
+				  	</div>
+				</form>		
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editVideoSub()">保存</button>
+			</div>
+		</script>
+	</div>
+</div>

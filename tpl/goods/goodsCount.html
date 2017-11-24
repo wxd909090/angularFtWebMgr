@@ -1,0 +1,83 @@
+<div class="goodsTypeWrap">
+	<!-- <div class="my-page-header clear">
+		<div class="pull-left">商品销售统计</div>
+		<div class="pull-left m-l">
+			<select class="form-control w-200 inline" ng-model="saleType" ng-options="sale.type as sale.name for sale in saleTypeData" ng-change="changeSaleStatistic(saleType)"></select>
+		</div>
+	</div> -->
+	<div class="my-page-header clear">
+		<div class="pull-left">请选择门店</div>
+		<div class="pull-left m-l">
+			<select ng-model="store" class="form-control w-200 inline" ng-options="store.store_name for store in storeListData" ng-change="changeStore(store)"></select>
+		</div>
+	</div>
+	<div class="my-page-header clear">
+		<button ng-click="getDocBtn()" class="btn btn-primary">导出</button>
+	</div>
+
+ 	<form class="form-inline pull-left">
+	  	<div class="form-group">
+	 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+      			<input type="text" class="form-control" uib-datepicker-popup ng-model="start_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+	          	<span class="input-group-btn">
+	            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+	          	</span>
+			</p>
+	 	</div>
+		<div class="form-group">—</div>
+	 	<div class="form-group">
+	 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+      			<input  type="text" class="form-control" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+	          	<span class="input-group-btn">
+	            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+	          	</span>
+			</p>
+	 	</div>
+	</form>
+	
+	
+	<!-- 表格 -->
+	<div class="goodsTypeWrapBottom clear-both clear">
+		<div class="m-t-md">
+		  	<div>
+	  			<div class="table-header">
+	  				<div class="flex-2 text-center">序号</div>
+					<div class="flex-2 text-center">商品</div>
+					<div class="flex-2 text-center">销量</div>
+					<div class="flex-2 text-center">金额</div>
+				</div>
+				<!-- <div class="table-header">
+					<div class="flex-2 text-center">*热销</div>
+					<div class="flex-2 text-center">33</div>
+					<div class="flex-2 text-center">
+						100
+					</div>
+				</div> -->
+				<div class="table-body" ng-sortable="$ctrl.sortableConf">
+					<div ng-repeat="goodsType in goodCountList" class="goodsTypeTableTd">
+						<div class="flex-2 text-center">{{$index+1}}</div>
+						<div class="flex-2 text-center">{{goodsType.name}}</div>
+						<div class="flex-2 text-center">{{goodsType.amount}}</div>
+						<div class="flex-2 text-center">{{goodsType.price}}</div>
+					</div>
+				</div>
+		  	</div>
+		</div>
+	</div>
+	<!-- 分页 -->
+	<div>
+		<!-- <ul style="margin-left:40px;" uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+		<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+			<input type="text" ng-model="reqPage" style="width: 36px">
+			<button type="button" ng-click="setPage()" >跳转</button>
+			最大页数: {{maxPage}} 页
+		</div> -->
+
+
+		<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+		<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+			<input type="text" ng-model="reqPage" style="width: 36px">
+			<button type="button" ng-click="setPage()" >跳转</button>
+			最大页数: {{maxPage}} 页
+		</div>
+	</div>

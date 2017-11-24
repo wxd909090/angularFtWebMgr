@@ -1,0 +1,243 @@
+<ul class="nav">
+  <!-- <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+    <span>门店信息</span>
+  </li> -->
+  <!-- 门店 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa  fa-home"></i>
+      <span class="font-bold">门店管理</span>
+    </a>
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.storeList" title="门店列表">
+          <span>门店列表</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.staffList" title="门店管理员">
+          <span>门店管理员</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.storeMaster" title="门店主机">
+          <span>门店主机</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 商品 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa fa-shopping-cart"></i>
+      <span class="font-bold">商品订单</span>
+    </a>
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.goodsOrderHandle" title="待处理订单">
+          <span>待处理订单</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.historyOrderHandle" title="订单查询">
+          <span>订单查询</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.goodsOrderSta" title="订单统计">
+          <span>订单统计</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 商品管理 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa  fa-folder-open"></i>
+      <span class="font-bold">商品管理</span>
+    </a>
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.salingGoods" title="出售中商品">
+          <span>出售中商品</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.notSalingGoods" title="下架中商品">
+          <span>下架中商品</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.goodsType" title="分类管理">
+          <span>分类管理</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.goodsCount" title="商品统计">
+          <span>商品统计</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 电影管理 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa  fa-file-movie-o"></i>
+      <span class="font-bold">电影管理</span>     
+    </a>
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.filmMgr" title="门店电影">
+          <span>门店电影</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.topic" title="专题管理">
+          <span>专题管理</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.forbidFilm" title="禁播电影">
+          <span>禁播电影</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.celebrity" title="名人信息">
+          <span>名人信息</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 用户信息 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa fa-user"></i>
+      <span class="font-bold">用户信息</span>     
+    </a>
+    <ul class="nav nav-sub dk">  
+      <li ui-sref-active="active">
+        <a ui-sref="app.userList" title="注册用户">
+          <span>注册用户</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.userAssess" title="用户评论">
+          <span>用户评论</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.statistics" title="用户分析">
+          <span>用户分析</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 活动管理 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="icon icon-printer"></i>
+      <span class="font-bold">活动管理</span>     
+    </a>
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.activities" title="体验码">
+          <span>体验码</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.groupBuy" title="团购码">
+          <span>团购码</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.vouchers" title="抵用券">
+          <span>抵用券</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 营业数据 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa fa-signal"></i>
+      <span class="font-bold">营业数据</span>     
+    </a>
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.storeStream" title="门店对比">
+          <span>门店对比</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.storeStatistic" title="统计结算">
+          <span>统计结算</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+  <!-- 系统设置 -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="fa fa-cog"></i>
+      <span class="font-bold">系统设置</span>     
+    </a>
+
+    <ul class="nav nav-sub dk">
+      <li ui-sref-active="active">
+        <a ui-sref="app.commonSet" title="公共设置">
+          <span>公共设置</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.businessApp" title="商家程序版本管理">
+          <span>商家程序版本管理</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.versionMgr" title="商家程序管理">
+          <span>商家程序管理</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+
+</ul>

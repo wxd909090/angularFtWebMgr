@@ -1,0 +1,99 @@
+<div class="goodsTypeWrap">
+	<div class="my-page-header clear">
+		<div class="pull-left">选择门店</div>
+		<div class="pull-left m-l">
+			<select ng-model="store" class="form-control w-200 inline" ng-options="store.store_name for store in storeListData" ng-change="changeStore(store)"></select>
+		</div>
+	</div>
+	<div class="my-page-header clear">
+		<div class="pull-left">订单统计</div>
+		<div class="pull-left m-l">
+			<select class="form-control w-200 inline" ng-model="saleType" ng-options="sale.type as sale.name for sale in saleTypeData" ng-change="changeSaleStatistic(saleType)"></select>
+		</div>
+	</div>
+	<div class="my-page-header clear">
+		<div class="pull-left">
+			<span>*总成交</span>
+			<span>总订单数：</span>
+			<span>{{goodsOrderSta.countNum}}</span>
+			<span>总成交额</span>
+			<span>￥{{goodsOrderSta.countPrice}}</span>
+		</div>
+		<!-- <div class="pull-right">
+	 		<button ng-click="getDocBtn()">导出</button>
+	 	</div> -->
+	</div>
+	<div class="my-page-header clear">
+		<button ng-click="getDocBtn()" class="btn btn-primary">导出</button>
+	</div>
+	<!-- 日期 -->
+	<!-- <form class="form-inline userAssessForm" style="padding:20px 20px 20px 40px;border-bottom:1px solid #ddd;">
+		<div class="form-group">
+	 		<button>选择日期</button>
+	 	</div>
+		<div class="form-group">
+	 		<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" style="width:85%" />
+	 		<span class="input-group-btn pull-left">
+	        	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+	      	</span>
+	 	</div>
+	 	<div class="form-group">
+	 		<label class="control-label">周：</label>
+            <select id="selectWeek" style="width: 200px" id="selectWeek" class="form-control input-se" size="1" ng-change="SelectChangeWeek()"
+                    ng-init="selectedWeek = ''"
+                    ng-model="selectedWeek"
+                    ng-options="x for x in myWeek">
+            </select>
+	 	</div>
+	 	<div class="form-group">
+	 		<label class="control-label">月：</label>
+            <select id="selectMoth" class="form-control input-se" size="1" ng-change="SelectChangeMoth()"
+                    ng-init="selectedMoth = ''"
+                    ng-model="selectedMoth"
+                    ng-options="x for x in myMoth">
+            </select>
+	 	</div>
+	 	<div class="form-group">
+	 		<button>查询</button>
+	 	</div>
+	 	<div class="form-group">
+	 		<button ng-click="getDocBtn()">导出</button>
+	 	</div>
+ 	</form> -->
+
+
+	<!-- 表格 -->
+	<div class="goodsTypeWrapBottom clear-both clear">
+		<div class="m-t-md">
+		  	<div>
+	  			<div class="table-header">
+					<div class="flex-2 text-center">时间</div>
+					<div class="flex-2 text-center">订单数</div>
+					<div class="flex-2 text-center">订单总额</div>
+				</div>
+				<!-- <div class="table-header">
+					<div class="flex-2 text-center">*热销</div>
+					<div class="flex-2 text-center">33</div>
+					<div class="flex-2 text-center">
+						100
+					</div>
+				</div> -->
+				<div class="table-body" ng-sortable="$ctrl.sortableConf">
+					<div ng-repeat="goodsType in goodsOrderStaLists" class="goodsTypeTableTd">
+						<div class="flex-2 text-center">{{goodsType.start_time | turnDateYMD}}--{{goodsType.end_time | turnDateYMD}}</div>
+						<div class="flex-2 text-center">{{goodsType.g_order_num}}</div>
+						<div class="flex-2 text-center">{{goodsType.g_order_price}}</div>
+					</div>
+				</div>
+		  	</div>
+		</div>
+	</div>
+	<!-- 分页 -->
+	<div>
+		<ul style="margin-left:40px;" uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+		<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+			<input type="text" ng-model="reqPage" style="width: 36px">
+			<button type="button" ng-click="setPage()" >跳转</button>
+			最大页数: {{maxPage}} 页
+		</div>
+	</div>

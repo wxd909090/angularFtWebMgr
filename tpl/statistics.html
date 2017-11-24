@@ -1,0 +1,49 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 -->
+<div class="pt_36 text-center font16">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+    <div class="animated fadeIn">
+        <div style="margin-top: 40px;" class="col-sm-11">
+
+            <!-- 用户分析 -->
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <div class="col-sm-3 col-md-2">
+                        <select class="form-control" ng-change="changeSel(formDataType)" ng-model="formDataType">
+                            <option>月统计</option>
+                            <option>周统计</option>
+                            <option>日统计</option>
+                        </select>
+                    </div>
+
+                </div>
+            </form>
+            <hr>
+            <!-- <ng-echarts class="col-md-12 echarts" ec-config="lineConfig" ec-option="optionUserAnalysis" ></ng-echarts> -->
+            <table class="table table-responsive table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th ng-cloak class="text-center">日期</th>
+                    <th ng-cloak class="text-center">注册用户数</th>
+                    <th ng-cloak class="text-center">活跃用户数</th>
+                    <th ng-cloak class="text-center">消费用户数</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td ng-cloak class="text-center">总数</td>
+                    <td ng-cloak class="text-center">{{total_register_number}}</td>
+                    <td ng-cloak class="text-center">{{total_activity_number}}</td>
+                    <td ng-cloak class="text-center">{{total_consume_number}}</td>
+                </tr>
+                <tr ng-repeat="userStatistics in userStatisticsListData">
+                    <td ng-cloak class="text-center">{{userStatistics.time | turnDateYMD}}</td>
+                    <td ng-cloak class="text-center">{{userStatistics.register_number}}</td>
+                    <td ng-cloak class="text-center">{{userStatistics.activity_number}}</td>
+                    <td ng-cloak class="text-center">{{userStatistics.consume_number}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <ul ng-show="formDataType == '日统计'" uib-pagination total-items="bigTotalItems" items-per-page="perPage" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页"></ul>
+        </div>
+    </div>
+</div>

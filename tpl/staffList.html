@@ -1,0 +1,244 @@
+<div class="pt_36  text-center font16" style="margin-top:40px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable">
+		<table class="table table-responsive table-bordered table-hover">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center">管理员名称</th>
+		            <th ng-cloak class="text-center">管理员电话</th>
+		            <th ng-cloak class="text-center">管理员状态</th>
+		            <th ng-cloak class="text-center">添加日期</th>
+		            <th ng-cloak class="text-center">管理门店</th>
+		            <th ng-cloak class="text-center">操作</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    	<tr ng-repeat="staff in staffListData">
+		    		<td ng-clock class="text-center">{{ staff.staff_name }}</td>
+		    		<td ng-clock class="text-center">{{ staff.mobile }}</td>
+		    		<td ng-clock class="text-center normalStaff" ng-show="staff.status == 0">{{ staff.status | turnStaffStatus}}</td>
+		    		<td ng-clock class="text-center formalStaff" ng-show="staff.status == 1">{{ staff.status | turnStaffStatus}}</td>
+		    		<td ng-clock class="text-center">{{ staff.create_time | turnDate}}</td>
+		    		<td ng-clock class="text-left" style="text-indent:20px">
+		    			<span ng-repeat="storeRelation in staff.relationList" style="margin-right: 10px">{{storeRelation.store_info.store_name}}</span>
+		    		</td>
+		    		<td ng-clock class="text-center clearPadding">
+						<button class="btn btn-info" ng-click="getStaffLog(staff,$index)">查看记录</button>
+		    			<button class="btn btn-info" ng-click="editStaff(staff,$index)">编辑</button>
+		    			<button class="btn btn-danger" ng-click="delStaff(staff,$index)">删除</button>
+		    		</td>
+		    	</tr>
+		    	<tr>
+		    		<td><button class="btn btn-success" ng-click="addStaff()">添加员工</button></td>
+		    		<td></td>
+		    		<td></td>
+		    		<td></td>
+		    		<td></td>
+		    		<td></td>
+		    	</tr>
+		    </tbody>
+		</table>
+	</div>
+
+
+	<!--管理员编辑模态框模板-->
+    <div>
+        <script type="text/ng-template" id="editStaff.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">管理员编辑
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" name="staffEditorForm" verify-scope>
+				  	<div class="form-group">
+				    	<label for="inputPassword" class="col-sm-3 control-label">管理员名字:</label>
+					    <div class="col-sm-8">
+					    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="editStaffData.staff_name" placeholder="请输入管理员名字">
+					    </div>
+				  	</div>
+				  	<!-- <div class="form-group">
+				    	<label for="inputPassword" class="col-sm-3 control-label">管理员昵称:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="editStaffData.nick_name" placeholder="请输入管理员昵称">
+					    </div>
+				  	</div> -->
+				  	<div class="form-group">
+				    	<label for="inputPassword" class="col-sm-3 control-label">电话号码:</label>
+					    <div class="col-sm-8">
+					      	<input ng-verify="{pattern:/^1[34578]\d{9}$/,errmsg:'请输入正确的电话号码'}" type="input" class="form-control" ng-model="editStaffData.mobile" placeholder="请输入正确的电话号码">
+					    </div>
+				  	</div>
+					<div class="form-group">
+				  		<label class="col-sm-3 control-label">管理员状态:</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+								<label class="i-checks">
+									<input type="radio" checked="" name="confirmOrder" ng-model="editStaffData.status" ng-value="0"><i></i>正常
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="editStaffData.status" ng-value="1"><i></i>禁用
+								</label>
+							</div>
+					    </div>
+				  	</div>
+				  	<!-- <div class="form-group">
+						<label class="col-sm-3 control-label">管理人信息:</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="editStaffData.info" placeholder="输入管理人信息"></textarea> 
+						</div>
+			  		</div> -->
+			  		<div class="form-group">
+				    	<label for="inputPassword" class="col-sm-3 control-label">管理门店:</label>
+					    <div class="col-sm-8">
+					    	<div class="row" style="margin:0">
+					    		<div class="col-xs-9" style="padding:0">
+								    <select class="form-control" ng-model="selectedStore" ng-options="x.store_name for x in storeListData"></select>
+					    		</div>
+								<div class="col-xs-2" style="padding:0;margin-left: 10px">
+									<button class="btn btn-primary" ng-click="bindStaff()">添加门店</button>
+								</div>
+					    	</div>
+					    	
+					      	<div class="row" style="margin:10px 0 0 0">
+					      		<ul class="list-group text-center administrorUl">
+					      			<li class="list-group-item text-left" ng-repeat="storeList in staffInfo.relationList" class="text-left">
+					      				{{ $index+1 }} . {{storeList.store_info.store_name}} 
+					      				<button class="btn btn-danger btn-circle m-l pull-right" style="margin-top:-7px" ng-click="unbindStaff(storeList,$index,storeList.store_info.store_sn)">删除</button>
+					      			</li>
+								</ul>
+					      	</div>
+					    </div>
+				  	</div>
+				</form>				
+            </div>
+            <div class="modal-footer">  
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+                <button type="button" class="btn btn-primary" ng-click="editStaffSubmit()">保存</button>  
+            </div> 
+        </script>
+    </div>
+
+    	<!--添加员工模态框模板-->
+    <div>
+        <script type="text/ng-template" id="addStaff.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">添加员工
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+				<form class="form-horizontal" name="staffAddForm" verify-scope>
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">管理员名字:</label>
+					    <div class="col-sm-8">
+					    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="addStaffData.staff_name" placeholder="请输入管理员名字">
+					    </div>
+				  	</div>
+				  	<!-- <div class="form-group">
+				    	<label class="col-sm-3 control-label">管理员昵称:</label>
+					    <div class="col-sm-8">
+					    	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="addStaffData.nick_name" placeholder="请输入管理员昵称">
+					    </div>
+				  	</div> -->
+				  	<div class="form-group">
+				    	<label class="col-sm-3 control-label">电话号码:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="{pattern:/^1[34578]\d{9}$/,errmsg:'请输入正确的电话号码'}" class="form-control" ng-model="addStaffData.mobile" placeholder="输入电话号码">
+					    </div>
+				  	</div>
+				  	<!-- <div class="form-group">
+				    	<label class="col-sm-3 control-label">管理员密码:</label>
+					    <div class="col-sm-8">
+					      	<input type="input" ng-verify="min:1, max:30" class="form-control" ng-model="addStaffData.password" placeholder="输入管理员密码">
+					    </div>
+				  	</div> -->
+				  	<div class="form-group">
+				  		<label class="col-sm-3 control-label">管理员状态:</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+								<label class="i-checks">
+									<input type="radio" ng-checked="true" name="confirmOrder" ng-model="addStaffData.status" ng-value="0"><i></i>正常
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="addStaffData.status" ng-value="1"><i></i>禁用
+								</label>
+							</div>
+					    </div>
+				  	</div>
+				  	<!-- <div class="form-group">
+						<label class="col-sm-3 control-label">管理人信息:</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="addStaffData.info" placeholder="输入管理人信息"></textarea> 
+						</div>
+			  		</div> -->
+				</form>				
+            </div>
+            <div class="modal-footer">  
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>  
+                <button type="button" class="btn btn-primary" ng-click="addStaffSubmit()">保存</button>  
+            </div> 
+        </script>
+    </div>
+
+	<!--管理员记录模态框模板-->
+	<div>
+		<script type="text/ng-template" id="getStaffLog.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">打扫记录
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<label for="" class="col-sm-4 control-label">日期:</label>
+						<div class="col-sm-6">
+							<input type="text" style="float: left;width:60%;text-align: center;" readonly class="form-control" uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" />
+							<span class="input-group-btn">
+	            				<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+	          				</span>
+						</div>
+					</div>
+				</form>
+				<table class="table table-responsive table-bordered table-hover">
+					<thead>
+					<tr>
+						<th  ng-cloak class="text-center sorting_asc">序号 <span class="footable-sort-indicator"></span></th>
+						<th  ng-cloak class="text-center sorting_asc">日期 <span class="footable-sort-indicator"></span></th>
+						<th  ng-cloak class="text-center sorting_asc">打扫门店 <span class="footable-sort-indicator"></span></th>
+						<th  ng-cloak class="text-center sorting_asc">打扫房间 <span class="footable-sort-indicator"></span></th>
+						<th  ng-cloak class="text-center sorting_asc">打扫时段 <span class="footable-sort-indicator"></span></th>
+					</tr>
+					</thead>
+					<tbody>
+					<!--<tr ng-if="staffLog.length == 0">-->
+						<!--<td ng-cloak class="text-center sorting_asc">暂无数据</td>-->
+						<!--<td ng-cloak class="text-center sorting_asc">暂无数据</td>-->
+						<!--<td ng-cloak class="text-center sorting_asc">暂无数据</td>-->
+						<!--<td ng-cloak class="text-center sorting_asc">暂无数据</td>-->
+						<!--<td ng-cloak class="text-center sorting_asc">暂无数据</td>-->
+					<!--<tr>-->
+					<tr ng-repeat="clearReord in staffLog" >
+						<td ng-cloak class="text-center sorting_asc">{{$index + 1}} </td>
+						<td ng-cloak class="text-center sorting_asc">{{clearReord.finish_time | turnDateHMS}} </td>
+						<td ng-cloak class="text-center sorting_asc">{{clearReord.store_name}} </td>
+						<td ng-cloak class="text-center sorting_asc">{{clearReord.room_name}}</td>
+						<td ng-cloak class="text-center sorting_asc">{{clearReord.duration_time}}</td>
+					<tr>
+					</tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+		</script>
+	</div>
+</div>

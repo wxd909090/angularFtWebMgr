@@ -1,0 +1,305 @@
+<div class="pt_36  text-center font16" style="margin-top:10px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable" style="padding: 0 15px">
+		<form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse" role="search" style="padding:0">
+			<div class="form-group">
+				<div class="input-group">
+					<input type="text" ng-model="keyWord" ng-change='serachUser()' class="form-control input-sm bg-light no-border rounded padder" placeholder="搜索手机号">
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-sm bg-light rounded" ng-click="serachUser()"><i class="fa fa-search"></i></button>
+					</span>
+				</div>
+			</div>
+        </form>
+		<table class="table table-responsive table-bordered table-hover">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center">序列号</th>
+		            <th ng-cloak class="text-center">用户电话号码</th>
+		            <th ng-cloak class="text-center">注册日期</th>
+		            <!-- <th ng-cloak class="text-center">钱包余额</th> -->
+		            <th ng-cloak class="text-center">押金</th>
+		            <th ng-cloak class="text-center">信用评分</th>
+		            <th ng-cloak class="text-center">未缴纳罚款</th>
+		            <th ng-cloak class="text-center">冻结</th>
+		            <th ng-cloak class="text-center">累计消费</th>
+		            <!-- <th ng-cloak class="text-center">消费次数</th> -->
+<!-- 		            <th ng-cloak class="text-center">观看记录</th>
+		            <th ng-cloak class="text-center">消费统计</th>
+		            <th ng-cloak class="text-center">使用记录</th> -->
+		        </tr>
+		    </thead>
+		    <tbody>
+		    	<tr ng-repeat="user in showUserData.list.data">
+		    		<td ng-clock class="text-center">{{$index + 1}}</td>
+		    		<td ng-clock class="text-center">{{user.mobile}}</td>
+		    		<td ng-clock class="text-center">{{user.create_time | turnDateYMD}}</td>
+		    		<!-- <td ng-clock class="text-center clearPadding">50  -->
+		    		<!-- <button class="btn btn-info" ng-click="walletRecord()">钱包记录</button> -->
+		    		<!-- </td> -->
+		    		<td ng-clock class="text-center clearPadding">{{user.deposit}} <a class="btn btn-text" ng-click="depositRecord(user)">押金记录</a></td>
+		    		<td ng-clock class="text-center">{{user.grade}}</td>
+		    		<td ng-clock class="text-center">{{user.compensate}} <a class="btn btn-text" ng-click="penaltiesRecord(user)">罚款记录</a></td>
+		    		<td ng-clock class="text-center">
+		    			<label class="i-switch i-switch-md bg-info m-t-xs m-r">
+			              	<input type="checkbox" ng-checked="user.status == 1" ng-click="changeUserSta(user)">
+			              	<i style="margin-right:40px"></i>
+			            </label>
+		    		</td>
+		    		<td ng-clock class="text-center">{{user.consumption}} <a class="btn btn-text" ng-click="watchRecord(user)">观看记录</a></td>
+		    		<!-- <td ng-clock class="text-center">12</td> -->
+<!-- 		    		<td ng-clock class="text-center clearPadding">
+		    			<button class="btn btn-info" ng-click="watchRecord()">查看</button>
+		    		</td>
+		    		<td ng-clock class="text-center clearPadding">
+		    			<button class="btn btn-info">查看</button>
+		    		</td>
+		    		<td ng-clock class="text-center clearPadding">
+		    			<button class="btn btn-info" ng-click="operationRecord()">查看</button>
+		    		</td> -->
+		    	</tr>
+		    </tbody>
+		</table>
+		<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页"></ul>
+	</div>
+
+	<!--钱包记录模态框模板-->
+    <div>
+        <script type="text/ng-template" id="walletRecord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">钱包记录</h4>
+		    </div>
+            <div class="modal-body mytable">
+				<table class="table table-responsive table-bordered table-hover">
+					<thead>
+						<tr>
+				            <th ng-cloak class="text-center">序号</th>
+				            <th ng-cloak class="text-center">日期</th>
+				            <th ng-cloak class="text-center">充值前余额</th>
+				            <th ng-cloak class="text-center">充值金额</th>
+				            <th ng-cloak class="text-center">赠送金额</th>
+				            <th ng-cloak class="text-center">充值后钱包金额</th>
+				            <th ng-cloak class="text-center">当前累计消费金额</th>
+				            <th ng-cloak class="text-center">累计赠送金额</th>
+				            <th ng-cloak class="text-center">累计充值金额</th>
+				        </tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td ng-cloak class="text-center">1</td>
+							<td ng-cloak class="text-center">2017-2-10 12:16:12</td>
+							<td ng-cloak class="text-center">0</td>
+							<td ng-cloak class="text-center">100</td>
+							<td ng-cloak class="text-center">20</td>
+							<td ng-cloak class="text-center">1000</td>
+							<td ng-cloak class="text-center">200</td>
+							<td ng-cloak class="text-center">40</td>
+							<td ng-cloak class="text-center">2000</td>
+						</tr>
+						<tr>
+							<td ng-cloak class="text-center">2</td>
+							<td ng-cloak class="text-center">2017-2-10 12:16:12</td>
+							<td ng-cloak class="text-center">0</td>
+							<td ng-cloak class="text-center">100</td>
+							<td ng-cloak class="text-center">20</td>
+							<td ng-cloak class="text-center">1000</td>
+							<td ng-cloak class="text-center">200</td>
+							<td ng-cloak class="text-center">40</td>
+							<td ng-cloak class="text-center">2000</td>
+						</tr>
+						<tr>
+							<td ng-cloak class="text-center">3</td>
+							<td ng-cloak class="text-center">2017-2-10 12:16:12</td>
+							<td ng-cloak class="text-center">0</td>
+							<td ng-cloak class="text-center">100</td>
+							<td ng-cloak class="text-center">20</td>
+							<td ng-cloak class="text-center">1000</td>
+							<td ng-cloak class="text-center">200</td>
+							<td ng-cloak class="text-center">40</td>
+							<td ng-cloak class="text-center">2000</td>
+						</tr>
+					</tbody>
+				</table>	
+            </div>
+        </script>
+    </div>
+
+	<!--押金记录模态框模板-->
+    <div>
+        <script type="text/ng-template" id="depositRecord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">押金记录</h4>
+		    </div>
+            <div class="modal-body mytable">
+				<table class="table table-responsive table-bordered table-hover">
+					<thead>
+						<tr>
+				            <th ng-cloak class="text-center">序号</th>
+				            <th ng-cloak class="text-center">日期</th>
+				            <th ng-cloak class="text-center">押金记录</th>
+				        </tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="deposit in depositList">
+							<td ng-cloak class="text-center">{{$index + 1}}</td>
+							<td ng-cloak class="text-center">{{deposit.alter_time | turnDateHMS}}</td>
+							<td ng-cloak class="text-left" ng-if="deposit.status == 0">充值押金{{deposit.price}}元(未付款)。</td>
+							<td ng-cloak class="text-left" ng-if="deposit.status == 1">充值押金{{deposit.price}}元。</td>
+							<td ng-cloak class="text-left" ng-if="deposit.status == 2">充值押金{{deposit.price}}元,未付款,已取消。</td>
+							<td ng-cloak class="text-left" ng-if="deposit.status == 3">退还押金{{deposit.price}}元成功。</td>
+						</tr>
+					</tbody>
+				</table>	
+            </div>
+        </script>
+    </div>
+	<!--罚款记录模态框模板-->
+    <div>
+        <script type="text/ng-template" id="penaltiesRecord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">罚款记录</h4>
+		    </div>
+            <div class="modal-body mytable">
+				<table class="table table-responsive table-bordered table-hover filmTable">
+				    <thead>
+				        <tr>
+				        	<th ng-cloak class="text-center">序号</th>
+				            <th ng-cloak class="text-center">日期</th>
+				            <th ng-cloak class="text-center">罚款金额</th>
+				            <th ng-cloak class="text-center">缴纳状态</th>
+				        </tr>
+				    </thead>
+				    <!--<tbody ng-if="maxPage == 0">-->
+				    	<!--<tr>-->
+				    		<!--<td ng-cloak class="text-center">暂无数据</td>-->
+				    		<!--<td ng-cloak class="text-center">暂无数据</td>-->
+				    		<!--<td ng-cloak class="text-center">暂无数据</td>-->
+				    		<!--<td ng-cloak class="text-center">暂无数据</td>-->
+				    	<!--</tr>-->
+				    <!--</tbody>-->
+				    <tbody ng-if="maxPage > 0">
+						<tr ng-repeat="penaltiesRecord in penaltiesRecordData">
+							<td ng-cloak class="text-center">{{$index + 1}}</td>
+							<td ng-cloak class="text-center">{{penaltiesRecord.alter_time | turnDateHMS}}</td>
+							<td ng-cloak class="text-center">{{penaltiesRecord.price}}</td>
+							<td ng-cloak class="text-center">{{penaltiesRecord.status | getStatus2}}</td>
+						</tr>
+				    </tbody>
+				</table>
+				<div style="position: relative;overflow: hidden">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 150px"></ul>
+					<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+						<input type="text" ng-model="reqPage" style="width: 36px">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div>	
+        	</div>
+        </script>
+    </div>
+
+	<!--观看记录模态框模板-->
+    <div>
+        <script type="text/ng-template" id="watchRecord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">观看记录</h4>
+		    </div>
+            <div class="modal-body mytable">
+				<table class="table table-responsive table-bordered table-hover">
+					<thead>
+						<tr>
+				            <th ng-cloak class="text-center">序号</th>
+				            <th ng-cloak class="text-center">门店</th>
+				            <th ng-cloak class="text-center">包间</th>
+				            <th ng-cloak class="text-center">观看日期</th>
+				            <th ng-cloak class="text-center">场次时段</th>
+				            <th ng-cloak class="text-center">电影</th>
+				            <th ng-cloak class="text-center">订单价格</th>
+				            <th ng-cloak class="text-center">实际付款</th>
+				            <th ng-cloak class="text-center">消费方式</th>
+				            <th ng-cloak class="text-center">评分</th>
+				            <th ng-cloak class="text-center">罚款</th>
+				        </tr>
+					</thead>
+					<tbody>
+						<!--<tr ng-if="WatchRecordData.length == 0">-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+							<!--<td ng-cloak class="text-center">暂无数据</td>-->
+						<!--</tr>-->
+						<tr ng-repeat="WatchRecord in WatchRecordData">
+							<td ng-cloak class="text-center">{{$index + 1}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.info.store_name}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.info.room_name}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.reserve_time | turnDateYMD}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.info.duration_time}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.info.film_name}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.price}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.pay_price}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.pay_type | payTypeStatus}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.grade}}</td>
+							<td ng-cloak class="text-center">{{WatchRecord.real_damage}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="userListPag">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页"></ul>
+					<div class="pull-left">
+						<input type="text" ng-model="reqPage">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div>		
+            </div>
+        </script>
+    </div>
+
+    <!--使用记录模态框模板-->
+    <div>
+        <script type="text/ng-template" id="operationRecord.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">使用记录</h4>
+		    </div>
+            <div class="modal-body mytable">
+				<table class="table table-responsive table-bordered table-hover">
+					<thead>
+						<tr>
+				            <th ng-cloak class="text-center">序号</th>
+				            <th ng-cloak class="text-center">时间</th>
+				            <th ng-cloak class="text-center">操作详情</th>
+				        </tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>1</td>
+							<td>2017-2-10 12:00-14:00</td>
+							<td>预定电影 大闹天宫 建设路店 102包间 13:00 - 15:00</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>2017-2-10 12:00-14:00</td>
+							<td>充值押金</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>2017-2-10 12:00-14:00</td>
+							<td>扫描开门</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>2017-2-10 12:00-14:00</td>
+							<td>退换押金</td>
+						</tr>
+					</tbody>
+				</table>	
+            </div>
+        </script>
+    </div>
+</div>

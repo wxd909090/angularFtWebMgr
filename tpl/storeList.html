@@ -1,0 +1,834 @@
+<!-- 巨幕：这是一个轻量、灵活的组件，它能延伸至整个浏览器视口来展示网站上的关键内容。 --> 
+<div class="pt_36  text-center font16" style="margin-top:20px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable">
+		<div class="pull-left chooseWrap text-left" style="margin-left: 24px;width: 100%">
+			<div class="checkbox">
+				<label class="i-checks">
+					<select style="width: 110px" class="form-control text-center" ng-model="showStatus" ng-options="status.value as status.name for status in showStatusArr"></select>
+				</label>
+				<label class="i-checks">
+					<button class="btn m-b-xs w-xs btn-info btn-sm" ng-click="checkAllDevice()">所有设备</button>
+				</label>
+				<label class="i-checks">
+					<button class="btn m-b-xs w-xs btn-info btn-sm" ng-click="allOrderMgr()">订单管理</button>
+				</label>
+				<label class="i-checks">
+					<button class="btn m-b-xs w-xs btn-info btn-sm" ng-click="defaultPoster()">默认海报</button>
+				</label>
+				<label class="i-checks pull-right m-r-xxl">
+					<button class="btn m-b-xs w-xs btn-info btn-sm" ng-click="addStore()">新增门店</button>
+				</label>
+			</div>
+		</div>
+		<table class="table table-responsive table-bordered table-hover" style="margin:0 auto">
+		    <thead>
+		        <tr>
+		            <th ng-cloak class="text-center">门店名称</th>
+		            <th ng-cloak class="text-center">创建日期</th>
+		            <th ng-cloak class="text-center">门店管理员</th>
+		            <th ng-cloak class="text-center">绑定账号</th>
+		            <th ng-cloak class="text-center">操作</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    	<tr ng-repeat="store in storeListData" ng-show="store.status == showStatus">
+	    			<td ng-clock class="text-center">{{store.store_name}}</td>
+		    		<td ng-clock class="text-center">{{store.create_time | turnDateYMD}}</td>
+		    		<td ng-clock class="text-left" style="text-indent: 10px">{{store.staff_name}}</td>
+	    			<td ng-clock class="text-center">{{store.agentInfo.account_name}}</td>
+		    		<td ng-clock class="text-center clearPadding">
+		    			<a class="btn btn-text" ng-href="#/app/roomList/{{store.store_sn}}" ng-click="enterStore(store.store_name)" >进入门店</a>
+		    			<a class="btn btn-text" ng-click="editorStore(store)">编辑门店</a>
+		    			<a class="btn btn-text" ng-click="posterMgr(store)">海报管理</a>
+		    			<a class="btn btn-text" ng-click="addDevice(store,$index)">添加设备</a>
+						<a class="btn btn-text" ng-click="agentAddOrEdit(store.store_sn)">账户管理</a>
+		    		</td>
+		    	</tr>
+		    </tbody>
+		</table>
+	</div>
+
+	<!-- 模态框模板 -->
+    <!--新增门店模态框模板-->
+    <div>
+        <script type="text/ng-template" id="addStoreModal.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">新增门店
+		        	<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+				</h4>
+		    </div>
+            <div class="modal-body">
+                <form class="form-horizontal modalForm"  name="addForm" verify-scope >
+                 	<!--<div class="form-group has-feedback">-->
+						<!--<label for="inputEmail3" class="col-sm-4 control-label">商家名字：</label>-->
+						<!--<div class="col-sm-8">-->
+							<!--<input type="text" ng-verify="min:1, max:50" class="form-control" id="" placeholder="请输入商家账号" required ng-model="formData.username">-->
+						<!--</div>-->
+					<!--</div>-->
+
+					<!--<div class="form-group has-feedback">-->
+						<!--<label for="inputEmail3" class="col-sm-4 control-label">商家密码：</label>-->
+						<!--<div class="col-sm-8">-->
+							<!--<input type="text" ng-verify="min:1, max:32" class="form-control" id="" placeholder="请输入商家密码" required ng-model="formData.password">-->
+						<!--</div>-->
+					<!--</div>-->
+					<div class="form-group has-feedback">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店名称：</label>
+						<div class="col-sm-8">
+							<input type="text" ng-verify="min:1, max:30" class="form-control" id="" placeholder="请输入门店名称" required ng-model="formData.store_name">
+						</div>
+					</div>
+					<div class="form-group has-feedback">
+						<label for="inputEmail3" class="col-sm-4 control-label">商家电话：</label>
+						<div class="col-sm-8">
+							<input type="text"  class="form-control" id="" placeholder="请输入商家电话"  ng-model="formData.mobile">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店地址：</label>
+						<div class="col-sm-8">
+							<input type="text" ng-verify="min:5, max:40"  class="form-control" id="" placeholder="请输入门店地址" required ng-model="formData.address" ng-blur="getStoreoLcation()">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">纬度坐标：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="formData.path_x" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">经度坐标：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="formData.path_y" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">省份：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="formData.province" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">城市：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="formData.city" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">地区：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="formData.district" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<!-- <div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店排序：</label>
+						<div class="col-sm-8">
+							<input ng-verify type="text" class="form-control" id="" placeholder="" required ng-model="formData.sort">
+						</div>
+			  		</div> -->
+			  		<div class="form-group">
+				  		<label class="col-sm-4 control-label">门店状态：</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+								<label class="i-checks">
+									<input type="radio" ng-checked="true" name="confirmOrder" ng-model="formData.status" ng-value="0"><i></i>正常
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="formData.status" ng-value="1"><i></i>禁用
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="formData.status" ng-value="2"><i></i>暂停营业
+								</label>
+							</div>
+					    </div>
+				  	</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店描述：</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="formData.info"></textarea> 
+						</div>
+			  		</div>
+		  			
+				</form>
+				
+            </div>
+            <div class="modal-footer">
+	            <button type="button" class="btn btn-default" ng-click="close()">关闭</button>
+	            <button type="submit" class="btn btn-primary" ng-click="formSubmit()">提交</button>
+	        </div>
+        </script>
+    </div>
+
+    <!--编辑门店模态框模板-->
+    <div>
+        <script type="text/ng-template" id="editorStore.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">编辑门店
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		        
+		    </div>
+            <div class="modal-body">
+                 <form class="form-horizontal modalForm" name="editorForm" verify-scope>
+
+					<div class="form-group has-feedback">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店名称：</label>
+						<div class="col-sm-8">
+							<input type="text" ng-verify="min:1, max:30" class="form-control" id="" placeholder="请输入门店名称" required ng-model="editorStoreData.store_name">
+						</div>
+					</div>
+					 <div class="form-group has-feedback">
+						 <label for="inputEmail3" class="col-sm-4 control-label">商家电话：</label>
+						 <div class="col-sm-8">
+							 <input type="text"  class="form-control" id="" placeholder="请输入商家电话"  ng-model="editorStoreData.mobile">
+						 </div>
+					 </div>
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店地址：</label>
+						<div class="col-sm-8">
+							<input type="text" ng-verify="min:5, max:40" class="form-control" id="" placeholder="请输入门店地址" required ng-model="editorStoreData.address" ng-blur="getStoreoLcation()">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">纬度坐标：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="editorStoreData.path_x" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">经度坐标：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="editorStoreData.path_y" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">省份：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="editorStoreData.province" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">城市：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="editorStoreData.city" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">地区：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="" required ng-model="editorStoreData.district" ng-disabled="true">
+						</div>
+			  		</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店主机：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="" placeholder="请输入门店主机串号" required ng-model="editorStoreData.server_imei">
+						</div>
+			  		</div>
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">大门设备：</label>
+						<div class="col-sm-8">
+							<select class="form-control" ng-model="editorStoreData.imei" >
+								<option></option>
+								<option ng-repeat="device in deviceArr" ng-selected="device.imei == editorStoreData.imei">{{device.imei}}</option>
+							</select>
+							<!-- <input type="text" class="form-control" ng-verify="min:1, max:80" placeholder="" required ng-model="editorStoreData.imei"> -->
+						</div>
+					</div>
+			  		<div class="form-group qrcode">
+				 		<label for="inputPassword3" class="col-sm-4 control-label">二维码：</label>
+					 	<div class="col-sm-8">
+					 		<!--<div class="col-sm-3" style="padding: 0;">-->
+						 		<!--<input type="text" ng-verify="min:1, max:80" class="form-control" style="display:none" ng-model="qr_code_type" ng-disabled="true">-->
+					 		<!--</div>-->
+					 		<div class="col-sm-8" style="padding: 0;margin-left: 2px;text-align: center">
+						 		<input type="text" ng-verify="min:1, max:80" class="form-control" id="" ng-model="qr_code_data" ng-disabled="qrCodeDis" ng-blur="changeQrType()">
+					 		</div>
+					 		<div class="pull-left" style="margin-left: 16px">
+					 			<button class="btn btn-primary" ng-click="changQrCode()">更换</button>
+					 		</div>
+					 		<div class="col-sm-12" style="padding: 0;">
+					 			<a href="javascript:;" class="thumbnail" style="margin-top: 10px">
+									<ng-qrcode qrcode-url="{{editorStoreData.qr_code}}"></ng-qrcode>
+								</a>
+					 		</div>
+						</div>
+				 	</div>
+			  		<div class="form-group">
+				  		<label class="col-sm-4 control-label">门店状态：</label>
+					    <div class="col-sm-8">
+					      	<div class="checkbox">
+								<label class="i-checks">
+									<input type="radio" checked="checked" name="confirmOrder" ng-model="editorStoreData.status" ng-value="0"><i></i>正常
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="editorStoreData.status" ng-value="1"><i></i>禁用
+								</label>
+								<label class="i-checks">
+									<input type="radio" name="confirmOrder" ng-model="editorStoreData.status" ng-value="2"><i></i>暂停营业
+								</label>
+							</div>
+					    </div>
+				  	</div>
+			  		<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label">门店描述：</label>
+						<div class="col-sm-8">
+							<textarea class="form-control" rows="3" required ng-model="editorStoreData.info"></textarea>
+						</div>
+			  		</div>
+				</form>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-primary pull-left" ng-click="createFilm()">创建门店电影表</button>
+	            <button type="button" class="btn btn-default" ng-click="close()">关闭</button>
+	            <button type="button" class="btn btn-primary" ng-click="editorStoreSubmit()">提交</button>
+	        </div>
+        </script>
+    </div>
+
+    <!--添加设备模态框模板-->
+    <div>
+        <script type="text/ng-template" id="addDevice.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">添加设备  ({{store.store_name}})
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body">
+				<ul class="list-group text-left">
+					<li class="list-group-item" ng-repeat="device in devices" style="text-indent: 15px"><span style="width: 380px;display: inline-block;">{{$index + 1}} . {{device}}</span> <button class="btn btn-danger m-l" ng-click="deletDevice(device,$index)">删除</button></li>
+				</ul>
+				<div class="row" style="margin:0">
+		    		<div class="col-xs-8 col-xs-offset-1" style="padding:0">
+					    <input type="text" class="form-control" id="" placeholder="" required ng-model="newDeviceData">
+		    		</div>
+					<div class="col-xs-2" style="padding:0;margin-left: 10px">
+						<button class="btn btn-primary" ng-click="addDeviceBtn()">添加设备</button>
+					</div>
+		    	</div>				
+            </div>
+        </script>
+    </div>
+
+    <!--编辑广告模态框模板-->
+    <div>
+        <script type="text/ng-template" id="editorAdvert.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">编辑广告视频</h4>
+		    </div>
+            <div class="modal-body mytable">
+				<table class="table table-responsive table-bordered table-hover">
+					<thead>
+				        <tr>
+				            <th ng-cloak class="text-center">序列号</th>
+				            <th ng-cloak class="text-center">视频名</th>
+				            <th ng-cloak class="text-center">添加日期</th>
+				            <th ng-cloak class="text-center">截止日期日期</th>
+				            <th ng-cloak class="text-center">操作</th>
+				        </tr>
+				    </thead>
+					<tbody>
+						<tr>
+							<td ng-cloak class="text-center">1</td>
+							<td ng-cloak class="text-center">充值广告</td>
+							<td ng-cloak class="text-center">2017.2.22</td>
+							<td ng-cloak class="text-center">2017.2.24</td>
+							<td ng-cloak class="text-center clearPadding">
+								<button class="btn btn-info" ng-click="editorAdvertBtn()">编辑</button>
+								<button class="btn btn-danger" ng-click="removeAdverBtn()">删除</button>
+							</td>
+						</tr>
+						<tr>
+							<td ng-cloak class="text-center">2</td>
+							<td ng-cloak class="text-center">影吧宣传</td>
+							<td ng-cloak class="text-center">2017.2.22</td>
+							<td ng-cloak class="text-center">2017.2.24</td>
+							<td ng-cloak class="text-center clearPadding">
+								<button class="btn btn-info" ng-click="editorAdvertBtn()">编辑</button>
+								<button class="btn btn-danger" ng-click="removeAdverBtn()">删除</button>
+							</td>
+						</tr>
+						<tr>
+							<td ng-cloak class="text-center">3</td>
+							<td ng-cloak class="text-center">电影推荐</td>
+							<td ng-cloak class="text-center">2017.2.22</td>
+							<td ng-cloak class="text-center">2017.2.24</td>
+							<td ng-cloak class="text-center clearPadding">
+								<button class="btn btn-info" ng-click="editorAdvertBtn()">编辑</button>
+								<button class="btn btn-danger" ng-click="removeAdverBtn()">删除</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>	
+            </div>
+        </script>
+    </div>
+
+    <!--管理相册模态框模板-->
+    <div>
+        <script type="text/ng-template" id="managePic.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">管理相册(建设路方糖影咖)</h4>
+		    </div>
+            <div class="modal-body picWrap">
+				<div>
+					<a href="javasript:" class="thumbnail">
+						<img src="./img/a0.jpg" alt="缩略图">
+					</a>
+					<div class="caption">
+						<p class="text-center">
+							<button href="#" class="btn btn-danger">删除</button>
+						</p>
+					</div>	
+				</div>
+				<div>
+					<a href="javasript:" class="thumbnail">
+						<img src="./img/a0.jpg" alt="缩略图">
+					</a>
+					<div class="caption">
+						<p class="text-center">
+							<button href="#" class="btn btn-danger">删除</button>
+						</p>
+					</div>	
+				</div>
+				<div>
+					<a href="javasript:" class="thumbnail">
+						<img src="./img/a0.jpg" alt="缩略图">
+					</a>
+					<div class="caption">
+						<p class="text-center">
+							<button href="#" class="btn btn-danger">删除</button>
+						</p>
+					</div>	
+				</div>		
+				<div>
+					<a href="javasript:" class="thumbnail">
+						<img src="./img/a0.jpg" alt="缩略图">
+					</a>
+					<div class="caption">
+						<p class="text-center">
+							<button href="#" class="btn btn-danger">删除</button>
+						</p>
+					</div>	
+				</div>
+				<div>
+					<a href="javasript:" class="thumbnail">
+						<img src="./img/a0.jpg" alt="缩略图">
+					</a>
+					<div class="caption">
+						<p class="text-center">
+							<button href="#" class="btn btn-danger">删除</button>
+						</p>
+					</div>	
+				</div>
+				<div>
+					<a href="javasript:" class="thumbnail">
+						<img src="./img/a0.jpg" alt="缩略图">
+					</a>
+					<div class="caption">
+						<p class="text-center">
+							<button href="#" class="btn btn-danger">删除</button>
+						</p>
+					</div>	
+				</div>
+            </div>
+        </script>
+    </div>
+
+    <!--所有设备模态框模板-->
+    <div>
+        <script type="text/ng-template" id="allDevice.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">所有设备
+		        <button type="button" class="close" ng-click="close()">
+			 		<span aria-hidden="true">&times;</span>
+			 		<span class="sr-only">Close</span>
+				</button>
+				</h4>
+		    </div>
+            <div class="modal-body">
+                <form class="form-inline">
+                	<div class="form-group m-r-10">
+				    	<input type="text" class="form-control" placeholder="搜索设备" ng-model="searchDevice">
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="exampleInputName2" class="m-r-10">门店</label>
+				    	<select class="form-control" ng-model="store_sn">
+				    		<option value="">全国门店</option>
+				    		<option ng-repeat="x in storeListData" value="{{x.store_sn}}">{{x.store_name}}</option>
+						</select>
+				  	</div>
+				  	<div class="form-group m-l-20">
+					  	<button class="btn btn-primary m-l-20 pull-right" ng-click="checkDevice()">查询</button>
+				  	</div>
+				</form>
+                <table class="table table-responsive table-bordered table-hover" style="margin-top: 15px">
+                	<thead>
+				        <tr>
+				            <th ng-cloak class="text-left text-indent-10">序列号</th>
+				            <th ng-cloak class="text-left text-indent-10">门店</th>
+				            <th ng-cloak class="text-left text-indent-10">包间</th>
+				        </tr>
+				    </thead>
+				    <tbody>
+				    	<tr ng-repeat="deviceArr in allDeviceData">
+				    		<td ng-cloak class="text-left text-indent-20 p-5">{{deviceArr.imei}}</td>
+				    		<td ng-cloak class="text-left text-indent-20 p-5">{{deviceArr.store_name}}</td>
+				    		<td ng-cloak class="text-left text-indent-20 p-5">{{deviceArr.room_name}}</td>
+				    	</tr>
+				    </tbody>
+                </table>
+                <div style="position: relative;overflow: hidden">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 20%"></ul>
+					<div class="pull-left m-t-md m-l-md">
+						<input type="text" ng-model="reqPage" style="width: 36px">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div>
+            </div>
+        </script>
+    </div>
+
+    <!--订单管理模态框模板-->
+    <div>
+        <script type="text/ng-template" id="allOrderMgr.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">所有订单
+		        <button type="button" class="close" ng-click="close()">
+			 		<span aria-hidden="true">&times;</span>
+			 		<span class="sr-only">Close</span>
+				</button>
+				</h4>
+		    </div>
+            <div class="modal-body">
+            	<form class="form-inline">
+				  	<div class="form-group">
+				    	<label for="exampleInputName2">门店:</label>
+				    	<select class="form-control" ng-model="order_store_sn">
+				    		<option value="">全国门店</option>
+				    		<option ng-repeat="x in storeListData" value="{{x.store_sn}}">{{x.store_name}}</option>
+						</select>
+				  	</div>
+				  	<div class="form-group m-l-20">
+				    	<p class="input-group m-p-0 pull-right">
+				    		<span class="pull-left dateTitle">日期: </span>
+				          	<input type="text" class="form-control" uib-datepicker-popup ng-model="order_reserve_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" style="width:83.6%"/>
+				          	<span class="input-group-btn">
+				            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+				          	</span>
+						</p>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="exampleInputName2" class="m-l-20 m-r-10">订单状态</label>
+				    	<select name="" id="" class="form-control" ng-model="order_status">
+				    		<option value="">全部状态</option>
+				    		<option value="0">未支付</option>
+				    		<option value="1">已预约</option>
+				    		<option value="2">使用中</option>
+				    		<option value="3">已完成</option>
+				    		<option value="4">已退款</option>
+				    		<option value="5">已过期</option>
+				    		<option value="6">未观影</option>
+				    		<option value="7">未打扫</option>
+				    	</select>
+				  	</div>
+				  	<div class="form-group">
+				    	<label for="exampleInputName2" class="m-l-20 m-r-10">支付类型</label>
+				    	<select name="" id="" class="form-control" ng-model="order_pay_type">
+				    		<option value="">全部支付类型</option>
+							<option ng-repeat="x in payType" value="{{x.value}}">{{x.name}}</option>
+				    	</select>
+				  	</div>
+				  	<div class="form-group m-l-20">
+					  	<button class="btn btn-primary m-l-20 pull-right" ng-click="checkOrder()">查询</button>
+						<h4 class="pull-right">
+					  		{{totalNum}}场
+					  	</h4>
+				  	</div>
+				</form>
+				<table class="table table-responsive table-bordered table-hover" style="margin-top: 15px">
+					<thead>
+						<tr>
+							<th ng-cloak class="text-center" style="width: 260px">订单号</th>
+							<th ng-cloak class="text-center">用户</th>
+							<th ng-cloak class="text-center">门店</th>
+							<th ng-cloak class="text-center">包间</th>
+							<th ng-cloak class="text-center">时段</th>
+							<th ng-cloak class="text-center">状态</th>
+							<th ng-cloak class="text-center">支付类型</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="showOrder in showOrderListData">
+							<td ng-cloak class="text-left" style="text-indent: 30px">{{showOrder.order_sn}}</td>
+							<td ng-cloak class="text-center">{{showOrder.mobile}}</td>
+							<td ng-cloak class="text-center">
+								<a ng-href="#/app/roomList/{{showOrder.store_sn}}" ng-click="enterStore(showOrder.store_name)">{{showOrder.store_name}}</a>
+							</td>
+							<td ng-cloak class="text-center">{{showOrder.room_name}}</td>
+							<td ng-cloak class="text-center">{{showOrder.duration_time}}</td>
+							<td ng-cloak class="text-center">{{showOrder.status | getStatus}}</td>
+							<td ng-cloak class="text-center">{{showOrder.pay_type | payTypeStatus}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div style="position: relative;overflow: hidden">
+					<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 30%"></ul>
+					<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+						<input type="text" ng-model="reqPage" style="width: 36px">
+						<button type="button" ng-click="setPage()" >跳转</button>
+						最大页数: {{maxPage}} 页
+					</div>
+				</div>
+            </div>
+        </script>
+    </div>
+
+	<!--agent模态框模板-->
+	<div>
+		<script type="text/ng-template" id="agent.html">
+			<div class="modal-header">
+				<h4 class="modal-title text-center">门店账号
+					<button type="button" class="close" ng-click="close()">
+						<span aria-hidden="true">&times;</span>
+						<span class="sr-only">Close</span>
+					</button>
+				</h4>
+
+			</div>
+			<div class="modal-body">
+				<h5 ng-show="isBind" class="modal-title text-center">温馨提示：
+
+					<span style="font-size: 16px;color: red">该门店已经绑定商家</span>
+					<span ng-show="accountName">({{accountName}})</span>
+				</h5>
+				<form class="form-horizontal modalForm" name="agentForm" verify-scope>
+					<div class="form-group has-feedback">
+						<label for="inputEmail3" class="col-sm-4 control-label">商家账户：</label>
+						<div class="col-sm-8">
+							<input type="text" ng-verify="min:0, max:50" class="form-control" id="" placeholder="请输入商家账号" ng-model="account_name">
+						</div>
+					</div>
+					<!--<div class="form-group has-feedback">-->
+						<!--<label for="inputEmail3" class="col-sm-4 control-label">商家电话：</label>-->
+						<!--<div class="col-sm-8">-->
+							<!--<input type="text" ng-verify="{pattern:/^1[34578]\d{9}$/,errmsg:'请输入正确的电话号码'}" class="form-control" id="" placeholder="请输入商家电话" required ng-model="agentData.mobile">-->
+						<!--</div>-->
+					<!--</div>-->
+					<!--<div class="form-group has-feedback">-->
+						<!--<label for="inputEmail3" class="col-sm-4 control-label">商家密码：</label>-->
+						<!--<div class="col-sm-8">-->
+							<!--<input type="text"  class="form-control" id="" placeholder="请输入要修改密码" ng-model="agentData.password">-->
+						<!--</div>-->
+					<!--</div>-->
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary pull-left" ng-click="agentUnbind()">解除绑定</button>
+				<button type="button" class="btn btn-default" ng-click="close()">关闭</button>
+				<button type="button" class="btn btn-primary" ng-click="agentBind()">提交</button>
+			</div>
+		</script>
+	</div>
+
+	<!--门店默认海报模态框模板-->
+    <div>
+        <script type="text/ng-template" id="defaultPoster.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">默认海报管理
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body posterList">
+            	<div class="col-xs-10" ng-show="showUpFile">
+            		<up-file></up-file>
+            	</div>            
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[0].poster_img" ng-click="addPoster(0)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[0].poster_img" src="{{baseUrl + showPosterList[0].poster_img}}" alt="缩略图">
+					</a>
+					<p class="text-center">1</p>
+					<span ng-show="showPosterList[0].poster_img" ng-click="delPoster(0)" class="closePosterBtn">X</span>
+				</div>
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[1].poster_img" ng-click="addPoster(1)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[1].poster_img" src="{{baseUrl + showPosterList[1].poster_img}}">
+					</a>
+					<p class="text-center">2</p>
+					<span ng-show="showPosterList[1].poster_img" ng-click="delPoster(1)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[2].poster_img" ng-click="addPoster(2)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[2].poster_img" src="{{baseUrl + showPosterList[2].poster_img}}">
+					</a>
+					<p class="text-center">3</p>
+					<span ng-show="showPosterList[2].poster_img" ng-click="delPoster(2)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[3].poster_img" ng-click="addPoster(3)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[3].poster_img" src="{{baseUrl + showPosterList[3].poster_img}}">
+					</a>
+					<p class="text-center">4</p>
+					<span ng-show="showPosterList[3].poster_img" ng-click="delPoster(3)" class="closePosterBtn">X</span>
+				</div>
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[4].poster_img" ng-click="addPoster(4)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[4].poster_img" src="{{baseUrl + showPosterList[4].poster_img}}">
+					</a>
+					<p class="text-center">5</p>
+					<span ng-show="showPosterList[4].poster_img" ng-click="delPoster(4)" class="closePosterBtn">X</span>
+				</div>
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[5].poster_img" ng-click="addPoster(5)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[5].poster_img" src="{{baseUrl + showPosterList[5].poster_img}}">
+					</a>
+					<p class="text-center">6</p>
+					<span ng-show="showPosterList[5].poster_img" ng-click="delPoster(5)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[6].poster_img" ng-click="addPoster(6)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[6].poster_img" src="{{baseUrl + showPosterList[6].poster_img}}">
+					</a>
+					<p class="text-center">7</p>
+					<span ng-show="showPosterList[6].poster_img" ng-click="delPoster(6)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[7].poster_img" ng-click="addPoster(7)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[7].poster_img" src="{{baseUrl + showPosterList[7].poster_img}}">
+					</a>
+					<p class="text-center">8</p>
+					<span ng-show="showPosterList[7].poster_img" ng-click="delPoster(7)" class="closePosterBtn">X</span>
+				</div>
+				<div class="text-center posterTitle">
+					注：上传图片最佳尺寸比例为750:355,其他尺寸会影响显示效果,格式为jpg、png,大小不超过500k
+				</div>		
+            </div>
+            <div class="modal-footer clear-both clear" style="clear: both;overflow: hidden">
+	            <button type="button" class="btn btn-default" ng-click="close()">关闭</button>
+	        </div>
+        </script>
+    </div>
+
+    <!-- 商家海报管理模态框模板 -->
+    <div>
+        <script type="text/ng-template" id="storePoster.html">
+        	<div class="modal-header">
+		        <h4 class="modal-title text-center">{{store_name}}
+					<button type="button" class="close" ng-click="close()">
+				 		<span aria-hidden="true">&times;</span>
+				 		<span class="sr-only">Close</span>
+					</button>
+		        </h4>
+		    </div>
+            <div class="modal-body posterList">
+            	<div class="col-xs-10" ng-show="showUpFile">
+            		<up-file></up-file>
+            	</div>            
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[0].poster_img" ng-click="addPoster(0)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[0].poster_img" src="{{baseUrl + showPosterList[0].poster_img}}" alt="缩略图">
+					</a>
+					<p class="text-center">1</p>
+					<span ng-show="showPosterList[0].poster_img" ng-click="delPoster(0)" class="closePosterBtn">X</span>
+				</div>
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[1].poster_img" ng-click="addPoster(1)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[1].poster_img" src="{{baseUrl + showPosterList[1].poster_img}}">
+					</a>
+					<p class="text-center">2</p>
+					<span ng-show="showPosterList[1].poster_img" ng-click="delPoster(1)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[2].poster_img" ng-click="addPoster(2)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[2].poster_img" src="{{baseUrl + showPosterList[2].poster_img}}">
+					</a>
+					<p class="text-center">3</p>
+					<span ng-show="showPosterList[2].poster_img" ng-click="delPoster(2)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[3].poster_img" ng-click="addPoster(3)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[3].poster_img" src="{{baseUrl + showPosterList[3].poster_img}}">
+					</a>
+					<p class="text-center">4</p>
+					<span ng-show="showPosterList[3].poster_img" ng-click="delPoster(3)" class="closePosterBtn">X</span>
+				</div>
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[4].poster_img" ng-click="addPoster(4)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[4].poster_img" src="{{baseUrl + showPosterList[4].poster_img}}">
+					</a>
+					<p class="text-center">5</p>
+					<span ng-show="showPosterList[4].poster_img" ng-click="delPoster(4)" class="closePosterBtn">X</span>
+				</div>
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[5].poster_img" ng-click="addPoster(5)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[5].poster_img" src="{{baseUrl + showPosterList[5].poster_img}}">
+					</a>
+					<p class="text-center">6</p>
+					<span ng-show="showPosterList[5].poster_img" ng-click="delPoster(5)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[6].poster_img" ng-click="addPoster(6)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[6].poster_img" src="{{baseUrl + showPosterList[6].poster_img}}">
+					</a>
+					<p class="text-center">7</p>
+					<span ng-show="showPosterList[6].poster_img" ng-click="delPoster(6)" class="closePosterBtn">X</span>
+				</div>	
+				<div class="col-xs-6 col-md-3 m-t-md">
+					<a href="#" class="thumbnail">
+						<img ng-show="!showPosterList[7].poster_img" ng-click="addPoster(7)" src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/uploadBg.png" alt="缩略图">
+						<img ng-show="showPosterList[7].poster_img" src="{{baseUrl + showPosterList[7].poster_img}}">
+					</a>
+					<p class="text-center">8</p>
+					<span ng-show="showPosterList[7].poster_img" ng-click="delPoster(7)" class="closePosterBtn">X</span>
+				</div>
+				<div class="text-left posterTitle">
+					<button type="button" class="btn btn-danger" ng-click="useDefault()">下载默认图片</button>
+				</div>
+				<div class="text-center posterTitle">
+					注：上传图片最佳尺寸比例为750:355,其他尺寸会影响显示效果,格式为jpg、png,大小不超过500k
+				</div>		
+            </div>
+            <div class="modal-footer clear-both clear" style="clear: both;overflow: hidden">
+	            <button type="button" class="btn btn-default" ng-click="close()">关闭</button>
+	        </div>
+        </script>
+    </div>
+</div>
+<!-- 提示框 -->
+<div class="alert alert-success fade in tipBoxDiv" ng-show="tipBox">          
+<button class="close" type="button" data-dismiss="alert">      
+	<span>×</span>           
+</button>            
+<p>             
+	提示：{{tipBoxText}}!
+</p>             
+</div>

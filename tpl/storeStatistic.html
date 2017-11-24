@@ -1,0 +1,465 @@
+<div class="pt_36  text-center font16" style="margin-top:10px">
+	<!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable" style="padding: 0 15px">
+		<div class="userAssess col-lg-10 col-md-12">
+			<div class="userAssessHeader">
+				<div class="btn-group">
+					<label ng-class="checkModel1" btn-checkbox ng-click="clickTable(1)">门店统计</label>
+					<label ng-class="checkModel2" btn-checkbox ng-click="clickTable(2)">结算记录</label>
+				</div>
+			</div>
+			<div class="userAssessContent" ng-show="checkModel1 == 'btn btn-default active'">
+				<div class="panel panel-default">
+					<!-- 时间 -->
+					<!-- 时间插件 -->
+					<div class="panel-heading font-bold">
+						统计
+					</div>
+					<div class="panel-body">
+						<!-- <div class="m-t-md ">
+							<button class="btn btn-primary pull-left">当天</button>
+							<form class="form-inline pull-left">
+							  	<div class="form-group">
+							 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+					          			<input type="text" class="form-control" uib-datepicker-popup ng-model="start_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+							          	<span class="input-group-btn">
+							            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+							          	</span>
+									</p>
+							 	</div>
+								<div class="form-group">—</div>
+							 	<div class="form-group">
+							 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+					          			<input  type="text" class="form-control" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+							          	<span class="input-group-btn">
+							            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+							          	</span>
+									</p>
+							 	</div>
+							</form>
+						</div> -->
+						<form class="form-inline userAssessForm">
+						</form>
+						<table class="table table-responsive table-bordered table-hover userAssessTable">
+							<thead>
+							<tr>
+								<th ng-cloak class="text-center">门店</th>
+
+								<!-- <th ng-cloak class="text-center">总金额</th>
+								<th ng-cloak class="text-center">微信</th>
+								<th ng-cloak class="text-center">会员卡</th>
+								<th ng-cloak class="text-center">电影-商品</th> -->
+								
+								<th ng-cloak class="text-center">营业统计</th>
+								<th ng-cloak class="text-center">包间统计</th>
+								<th ng-cloak class="text-center">消费统计</th>
+								<th ng-cloak class="text-center">结算</th>
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr ng-repeat="store in bigBusinessData">
+								
+								<td ng-cloak class="text-center">{{store.store_name}}</td>
+								<!-- <td ng-cloak class="text-center">{{store.total_price}}</td>
+								<td ng-cloak class="text-center">{{store.wx_price}}</td>
+								<td ng-cloak class="text-center">{{store.member_price}}</td>
+								<td ng-cloak class="text-center">{{store.m_num}}{{store.g_num}}</td> -->
+
+								<td ng-cloak class="text-center"><button type="submit" class="btn btn-info" ng-click="clickSaleStatistic(store.store_name,store.store_sn)">查看</button></td>
+								<td ng-cloak class="text-center"><button type="submit" class="btn btn-info" ng-click="clickRoomStatistic(store.store_name,store.store_sn)">查看</button></td>
+								<td ng-cloak class="text-center"><button type="submit" class="btn btn-info" ng-click="clickRecordStatistic(store.store_name,store.store_sn)">查看</button></td>
+								<td ng-cloak class="text-center"><button type="submit" class="btn btn-info" ng-click="clickSettle(store.store_name,store.store_sn)">结算</button></td>
+							</tr>
+							</tbody>
+						</table>
+						<div style="position: relative;overflow: hidden" ng-show="allTotalPage">
+							<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+							<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+								<input type="text" ng-model="reqPage" style="width: 36px">
+								<button type="button" ng-click="setPage()" >跳转</button>
+								最大页数: {{maxPage}} 页
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="userAssessContent" ng-show="checkModel2 == 'btn btn-default active'">
+				<div class="panel panel-default">
+					<div class="panel-heading font-bold">
+						结算
+					</div>
+					<div class="panel-body">
+						<form class="form-inline userAssessForm">
+							<select class="form-control" ng-model="storeSn" ng-change = "changeStore()">
+								<option value="">所有门店</option>
+								<option ng-repeat="store in allStoreListData" value="{{store.store_sn}}" ng-selected="store.store_sn == storeSn">{{store.store_name}}</option>
+							</select>
+							<div class="form-group">
+								<!-- <button type="submit" class="btn btn-info" ng-click="clickSettleStatistic()">查询</button> -->
+								<!--<button type="submit" class="btn btn-info" ng-click="exportRoomSattistic()">导出</button>-->
+							</div>
+							<div class="form-group">
+									<span class="saleTest .p-5">微信支付商户费率: {{recordDataList.settleCharge}}</span>
+									<span class="saleTest .p-5">实际营收 = 总营收  X  ( 1 - 费率 )</span>
+							</div>
+
+						</form>
+						<table class="table table-responsive table-bordered table-hover userAssessTable">
+							<thead>
+							<tr>
+								<th ng-cloak class="text-center" style="width: 50px">序号</th>
+								<th ng-cloak class="text-center">店名</th>
+								<th ng-cloak class="text-center">结算人</th>
+								<th ng-cloak class="text-center">结算日期</th>
+								<th ng-cloak class="text-center">结算时段</th>
+								<th ng-cloak class="text-center">总营收</th>
+								<th ng-cloak class="text-center">实际营收</th>
+								<th ng-cloak class="text-center">备注</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr ng-repeat="settle in recordDataLists">
+								<td ng-cloak class="text-center">{{$index + 1}}</td>
+								<td ng-cloak class="text-center">{{settle.store_name}}</td>
+								<td ng-cloak class="text-center">{{settle.operator}}</td>
+								<td ng-cloak class="text-center">{{settle.create_time | turnDateYMD}}</td>
+								<td ng-cloak class="text-center">{{settle.start_time}} — {{settle.end_time}}</td>
+								<td ng-cloak class="text-center">{{settle.price | number : 2}}</td>
+								<td ng-cloak class="text-center">{{settle.settle_price | number : 2}}</td>
+								<td ng-cloak class="text-center">{{settle.notice}}</td>
+							</tr>
+							</tbody>
+						</table>
+						<div style="position: relative;overflow: hidden">
+							<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+							<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+								<input type="text" ng-model="reqPage" style="width: 36px">
+								<button type="button" ng-click="setPage()" >跳转</button>
+								最大页数: {{maxPage}} 页
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--营业统计模板-->
+<div>
+	<script type="text/ng-template" id="sale.html">
+		<div class="modal-header">
+			<h4 class="modal-title text-center">营业统计---{{storeName}}
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-inline userAssessForm">
+				<div class="form-group">
+					<select class="form-control" ng-model="saleType" ng-options="sale.type as sale.name for sale in saleTypeData" ng-change="changeSaleStatistic()"></select>
+
+					<select class="form-control" ng-model="defaultType" ng-options="allType.type as allType.name for allType in allTypeData" ng-change="changeAllType()"></select>
+
+					<p style="display: inherit;" ng-show = "allDataShow">
+						<span class="saleTest .p-5">未结算金额 {{saleTotalData.no_settlement_price}}</span>
+						<span class="saleTest .p-5">上次结算时间: {{saleTotalData.last_settlement_date}}</span>
+						<span class="saleTest .p-5">累计结算金额: {{saleTotalData.total_price}}</span>
+					</p>
+					<button type="submit" class="btn btn-info" ng-click="exportSaleStatistic()">导出</button>
+				</div>
+			</form>
+			<table class="table table-responsive table-bordered table-hover userAssessTable">
+				<thead>
+				<tr>
+					<th ng-cloak class="text-center" style="width: 25%">日期</th>
+					<th ng-cloak class="text-center">总金额</th>
+					<th ng-cloak class="text-center">电影-金额</th>
+					<th ng-cloak class="text-center">退单-金额-手续费</th>
+					<th ng-cloak class="text-center">罚款-金额</th>
+					<th ng-cloak class="text-center">商品-金额</th>
+					<th ng-cloak class="text-center">商品退单-金额</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="sale in storeBusinessDataList">
+					<td ng-cloak class="text-center">{{sale.start_time}} - {{sale.end_time}}</td>
+					<td ng-cloak class="text-center">{{sale.total_price}}</td>
+					<td ng-cloak class="text-center">{{sale.m_order_num}} - {{sale.m_order_price}}</td>
+					<td ng-cloak class="text-center">{{sale.m_order_return_num}}-{{sale.m_order_return_price}}-{{sale.m_order_return_poundage}}</td>
+					<td ng-cloak class="text-center">{{sale.order_damage_num}}-{{sale.order_damage_price}}</td>
+					<td ng-cloak class="text-center">{{sale.g_order_num}}-{{sale.g_order_price}}</td>
+					<td ng-cloak class="text-center">{{sale.g_order_return_num}}-{{sale.g_order_return_price}}</td>
+				</tr>
+				</tbody>
+			</table>
+			<div style="position: relative;overflow: hidden">
+				<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+				<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+					<input type="text" ng-model="reqPage" style="width: 36px">
+					<button type="button" ng-click="setPage()" >跳转</button>
+					最大页数: {{maxPage}} 页
+				</div>
+			</div>
+		</div>
+	</script>
+</div>
+
+<!--包间统计模板-->
+<div>
+	<script type="text/ng-template" id="room.html">
+		<div class="modal-header" >
+			<h4 class="modal-title text-center">包间统计---{{storeName}}
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body" style="min-height:450px!important;">
+			<form class="form-inline pull-left">
+			  	<div class="form-group">
+			 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+	          			<input type="text" class="form-control" uib-datepicker-popup ng-model="start_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			          	<span class="input-group-btn">
+			            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</p>
+			 	</div>
+				<div class="form-group">—</div>
+			 	<div class="form-group">
+			 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+	          			<input type="text" class="form-control" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			          	<span class="input-group-btn">
+			            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</p>
+			 	</div>
+			 	<div class="form-group"><button type="submit" class="btn btn-info" ng-click="exportSaleStatistic()">导出</button></div>
+			</form>
+			<table class="table table-responsive table-bordered table-hover userAssessTable">
+				<thead>
+				<!-- <tr style="background-color: #ddd">
+					<th class="text-center">总计</th>
+					<th class="text-center" >场数 : {{total_count_duration}}</th>
+					<th class="text-center" >金额 : {{total_pay_price}}</th>
+				</tr> -->
+				<tr>
+					<th ng-cloak class="text-center">包间</th>
+					<th ng-cloak class="text-center">总金额
+						<!-- <span >
+							<a class="glyphicon glyphicon-chevron-up up" ng-click="orderByCount(2)"></a>
+							<a class="glyphicon glyphicon-chevron-down down" ng-click="orderByCount(1)"></a>
+						</span> -->
+					</th>
+					<th ng-cloak class="text-center">微信金额
+						<!-- <span >
+							<a class="glyphicon glyphicon-chevron-up up" ng-click="orderByMoney(2)"></a>
+							<a class="glyphicon glyphicon-chevron-down down" ng-click="orderByMoney(1)"></a>
+						</span> -->
+					</th>
+					<th ng-cloak class="text-center">会员金额</th>
+					<th ng-cloak class="text-center">电影-商品</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="room in roomData">
+					<td ng-cloak class="text-center">{{room.room_name}}</td>
+					<td ng-cloak class="text-center">{{room.total_price}}</td>
+					<td ng-cloak class="text-center">{{room.wx_price}}</td>
+					<td ng-cloak class="text-center">{{room.member_price}}</td>
+					<td ng-cloak class="text-center">{{room.m_num}}-{{room.g_num}}</td>
+				</tr>
+				</tbody>
+			</table>
+			<!--<div style="position: relative;overflow: hidden">-->
+				<!--<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>-->
+				<!--<div class="pull-left" style="margin-top: 20px;margin-left: 20px">-->
+					<!--<input type="text" ng-model="reqPage" style="width: 36px">-->
+					<!--<button type="button" ng-click="setPage()" >跳转</button>-->
+					<!--最大页数: {{maxPage}} 页-->
+				<!--</div>-->
+			<!--</div>-->
+		</div>
+	</script>
+</div>
+
+<!--消费统计模板-->
+<div>
+	<script type="text/ng-template" id="record.html">
+		<div class="modal-header">
+			<h4 class="modal-title text-center">消费统计---{{storeName}}
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body" style="min-height:450px!important;">
+			<form class="form-inline userAssessForm">
+				<div class="form-group">
+					<label for="name"></label>
+					<input type="text" class="form-control" placeholder="请输入11位电话号码" ng-model="recordMobile" ng-change="changeMobile()">
+				</div>
+				<div class="form-group">
+			 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+	          			<input type="text" class="form-control" uib-datepicker-popup ng-model="start_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			          	<span class="input-group-btn">
+			            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</p>
+			 	</div>
+				<div class="form-group">—</div>
+			 	<div class="form-group">
+			 		<p style="width: 260px;margin: 0" class="input-group pull-right">
+	          			<input type="text" class="form-control" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id=""/>
+			          	<span class="input-group-btn">
+			            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</p>
+			 	</div>
+
+				<!-- <div class="form-group">
+					<button type="submit" class="btn btn-info" ng-click="clickRecordStatistic()">查询</button>
+				</div> -->
+			</form>
+			<table class="table table-responsive table-bordered table-hover userAssessTable">
+				<thead>
+				<tr>
+					<th ng-cloak class="text-center" style="width: 50px">订单号</th>
+					<th ng-cloak class="text-center">用户</th>
+					<th ng-cloak class="text-center">预约信息</th>
+					<th ng-cloak class="text-center">订单内容</th>
+					<th ng-cloak class="text-center">支付</th>
+					<th ng-cloak class="text-center">下单日期</th>
+					<th ng-cloak class="text-center">状态</th>
+					<th ng-cloak class="text-center">商家评分</th>
+					<th ng-cloak class="text-center">退单费/罚款</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="record in recordsLists">
+					<td ng-cloak class="text-center">{{record.order_sn}}</td>
+					<td ng-cloak class="text-center">{{record.mobile}}</td>
+					<td ng-cloak class="text-center">{{record.room_name}}{{record.reserve_time}}{{record.duration_time}}</td>
+					<td ng-cloak class="text-center">{{record.film_name}}</td>
+					<td ng-cloak class="text-center">{{record.pay_type}}￥{{record.pay_price}}优惠￥{{record.discount_price}}</td>
+					<td ng-cloak class="text-center">{{record.create_time}}</td>
+					<td ng-cloak class="text-center">{{record.status_dec}}</td>
+					<td ng-cloak class="text-center">{{record.grade?record.grade:0}}</td>
+					<td ng-cloak class="text-center">退单费：￥{{record.return_poundage_price?record.return_poundage_price:0}}/罚款：￥{{record.return_poundage_price?record.return_poundage_price:0}}</td>
+				</tr>
+				</tbody>
+			</table>
+			<div style="position: relative;overflow: hidden">
+				<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+				<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+					<input type="text" ng-model="reqPage" style="width: 36px">
+					<button type="button" ng-click="setPage()" >跳转</button>
+					最大页数: {{maxPage}} 页
+				</div>
+			</div>
+		</div>
+	</script>
+</div>
+
+<!--结算模板-->
+<div>
+	<script type="text/ng-template" id="settle.html">
+		<div class="modal-header">
+			<h4 class="modal-title text-center">结算---{{storeName}}
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal">
+				<!-- <div class="form-group">
+					<label class="col-sm-3 control-label">开始时间:</label>
+					<div class="col-sm-6">
+						<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="startTime" readonly is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(startTime)" style="width:60%;text-align:center" />
+						<span class="input-group-btn pull-left">
+							<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">截止时间:</label>
+					<div class="col-sm-6">
+						<input type="text" class="form-control pull-left" uib-datepicker-popup ng-change="getSettleMoney()" ng-model="endTime" is-open="popup2.opened" datepicker-options="dateOptions2" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput2" ng-change="checkDateChange2(endTime)" style="width:60%;text-align:center" />
+						<span class="input-group-btn pull-left">
+							<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div> -->
+				<div class="form-group">
+					<label class="col-sm-3 control-label">开始时间:</label>
+			 		<div class="col-sm-6">
+	          			<input disabled="disabled"  type="text" class="form-control pull-left" uib-datepicker-popup ng-model="start_time"  is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="" style="width:60%;text-align:center"/>
+			          	<span class="input-group-btn pull-left">
+			            	<button type="button" class="btn btn-default" ><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</div>
+			 	</div>
+			 	<div class="form-group">
+			 	<label class="col-sm-3 control-label">截止时间:</label>
+			 		<div class="col-sm-6">
+	          			<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="end_time" is-open="popup2.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="" style="width:60%;text-align:center"/>
+			          	<span class="input-group-btn pull-left">
+			            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          	</span>
+					</div>
+			 	</div>
+
+
+
+
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">金额:</label>
+					<div class="col-sm-4" >
+						<input type="text"  class="form-control" id="" ng-model="price" ng-change="settlePriceChange()" ng-disabled="readOnly">
+					</div>
+					<div class="pull-left" style="margin-left: 36px">
+						<button class="btn btn-primary" ng-click="changeReadOnly()">更换</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">微信费率:</label>
+					<div class="col-sm-4" >
+						<input type="text"  class="form-control" id="" ng-model="settleCharge" ng-disabled="true">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">结算金额:</label>
+					<div class="col-sm-4" >
+						<input type="text"  class="form-control" id="" ng-model="settlePrice" ng-disabled="readOnly">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">结算人:</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control"  ng-model="operator" style="width:55%;">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">备注:</label>
+					<div class="col-sm-8">
+						<textarea type="text" class="form-control"  ng-model="notice" style="width:55%;"></textarea>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+			<button type="button" class="btn btn-primary" ng-click="settle()">结算</button>
+		</div>
+	</script>
+</div>
+

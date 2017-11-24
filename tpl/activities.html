@@ -1,0 +1,74 @@
+<div class="pt_36  text-center font16" style="margin-top:20px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable">
+		<form action="" class="activitiesForm">
+			<div class="form-group pull-left activitiesFormSelect">
+			 	<div>
+			 		<!-- 切换第几期 -->
+			 		<select class="form-control" ng-change="checkCode()" ng-model="group_num" ng-options="group_numChoose | group_numStatus for group_numChoose in group_numArr"></select>
+			 	</div>
+		 	</div>
+		 	<div class="form-group pull-left checkCodeBtn">
+		 		<button class="btn btn-primary" ng-click="exportActivityCode()">导出</button>
+		 	</div>
+	        <div class="form-group pull-left">
+		 		<label for="" class="control-label pull-left labeled">期数： </label>
+			 	<div class="pull-left" style="width: 50px">
+			 		<input type="text" class="form-control" id="" ng-model="creatGroup_num">
+			 	</div>
+		 	</div>
+		 	<div class="form-group pull-left">
+		 		<label for="" class="control-label pull-left labeled">数量： </label>
+			 	<div class="pull-left" style="width: 50px">
+			 		<input type="text" class="form-control" id="" ng-model="code_num">
+			 	</div>
+		 	</div>
+		 	<div class="form-group pull-left">
+			 	<label for="inputPassword3" class="pull-left labeled">有效日期： </label>
+			 	<div class="pull-left">
+			 		<p style="width: 260px;margin-right: 20px" class="input-group pull-right">
+	          			<input type="text" class="form-control" uib-datepicker-popup ng-model="expire_time" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput"/>
+	          	<span class="input-group-btn">
+	            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+	          	</span>
+			</p>
+			 	</div>
+		 	</div>
+		 	<div class="form-group pull-left buttons">
+		 		
+		 		<button class="btn btn-primary pull-left" ng-click="creatNewCode()">生成</button>
+		 	</div>
+		</form>
+		<table class="table table-responsive table-bordered table-hover" style="width: 894px;margin-left: 30px;clear: both;">
+		    <thead>
+		        <tr>
+		        	<th ng-cloak class="text-center" style="width: 10%">序号</th>
+		        	<th ng-cloak class="text-center" style="width: 20%">活动码</th>
+		        	<th ng-cloak class="text-center" style="width: 20%">有效期</th>
+		        	<th ng-cloak class="text-center" style="width: 10%">状态</th>
+		        	<th ng-cloak class="text-center" style="width: 20%">使用日期</th>
+		        	<th ng-cloak class="text-center" style="width: 20%">使用者</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    	<tr ng-repeat="code in codeArr">
+		    		<td ng-cloak class="text-center">{{$index + 1}}</td>
+		    		<td ng-cloak class="text-center">{{code.code}}</td>
+		    		<td ng-cloak class="text-center">{{code.expire_time | turnDateYMD}}</td>
+		    		<td ng-cloak class="text-center formalStaff" ng-if="code.is_used == 1">{{code.is_used | codeStatus}}</td>
+		    		<td ng-cloak class="text-center normalStaff" ng-if="code.is_used == 0">{{code.is_used | codeStatus}}</td>
+		    		<td ng-cloak class="text-center" >{{code.use_time | turnDateYMD}}</td>
+		    		<td ng-cloak class="text-center">{{code.user_info.mobile}}</td>
+		    	</tr>
+		    </tbody>
+		</table>
+		<div style="position: relative;overflow: hidden">
+			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 250px"></ul>
+			<div class="pull-left" style="margin-top: 20px;margin-left: 10px">
+				<input type="text" ng-model="reqPage" style="width: 36px">
+				<button type="button" ng-click="setPage()" >跳转</button>
+				最大页数: {{maxPage}} 页
+			</div>
+		</div>	
+	</div>
+</div>

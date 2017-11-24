@@ -1,0 +1,201 @@
+<div class="pt_36  text-center font16" style="margin-top:10px">
+    <!-- 这里div的class决定了加载效果,具体参考animate.css API -->
+	<div class="animated fadeIn mytable" style="padding: 0 15px">
+		<div class="userAssess col-lg-12 col-md-12">
+			<div class="userAssessHeader">
+		        <div class="btn-group">
+		          	<label ng-class="checkModel" btn-checkbox ng-click="clickUserAssess()">用户评论</label>
+		          	<label ng-class="checkMode2" btn-checkbox ng-click="clickStoreAssess()">门店评分</label>
+		        </div>
+			</div>
+			<div class="userAssessContent" ng-show="checkModel == 'btn btn-default active'">
+				 <div class="panel panel-default">
+	    			<div class="panel-heading font-bold">                  
+						用户评论
+	    			</div>
+	    			<div class="panel-body">
+	      				<form class="form-inline userAssessForm">
+						  	<div class="form-group">
+						    	<select class="form-control" ng-model="store_sn">
+						    		<option value="">全国门店</option>
+						    		<option ng-repeat="x in storeListData" value="{{x.store_sn}}">{{x.store_name}}</option>
+								</select>
+						  	</div>
+						  	<!-- <div class="form-group">
+							 	<label for="inputPassword3" class="control-label"></label>
+							 	<input type="daterange" class="form-control dateInput" ng-model="dateDay" ranges="rangesDate" id="dateDay" placeholder="选择日期">
+						 	</div> -->
+						 	<div class="form-group">
+						 		<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="checkDate" is-open="popup1.opened" datepicker-options="dateOptions" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput" ng-change="checkDateChange(checkDate)" style="width:85%" />
+					          	<span class="input-group-btn pull-left">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+						 	</div>
+						 	<div class="form-group">
+						 		—
+						 	</div>
+						 	<div class="form-group" style="margin-left: 0">
+						 		<input type="text" class="form-control pull-left" uib-datepicker-popup ng-model="checkDate2" is-open="popup2.opened" datepicker-options="dateOptions2" close-text="关闭" current-text="今天" clear-text="清空" id="orderDateInput2" ng-change="checkDateChange2(checkDate2)" style="width:85%" />
+					          	<span class="input-group-btn pull-left">
+					            	<button type="button" class="btn btn-default" ng-click="openDateBox2()"><i class="glyphicon glyphicon-calendar"></i></button>
+					          	</span>
+						 	</div>
+						  	<div class="form-group">
+						    	<label for="name"></label>
+						    	<input type="text" class="form-control" placeholder="用户手机号" ng-model="mobile">
+						  	</div>
+							<div class="form-group">
+								<select class="form-control" ng-model="isShow"  ng-change="changeisShow()">
+									<option value="0">所有</option>
+									<option ng-repeat="x in showtData" value="{{x.value}}">{{x.name}}</option>
+								</select>
+							</div>
+						  	<div class="form-group">
+						  		<button type="submit" class="btn btn-info" ng-click="searchBtn()">查询</button>
+						  		<button type="submit" class="btn btn-info" ng-click="getDocBtn()">导出</button>
+						  	</div>
+						</form>
+						<table class="table table-responsive table-bordered table-hover userAssessTable" style="table-layout: fixed;">
+			            	<thead>
+			            		<tr>
+			            			<th ng-cloak class="text-center" style="width: 50px">序号</th>
+			            			<th ng-cloak class="text-center">微信名/用户</th>
+			            			<th ng-cloak class="text-center">店铺/包间</th>
+			            			<th ng-cloak class="text-center" style="width:150px">卫生-影音-舒适</th>
+									<th ng-cloak class="text-center">想看</th>
+			            			<th ng-cloak class="text-center " style="max-width: 250px">初评</th>
+									<th ng-cloak class="text-center " style="max-width: 250px">回复</th>
+									<th ng-cloak class="text-center " style="max-width: 250px">追评</th>
+									<th ng-cloak class="text-center " style="max-width: 250px">回复</th>
+			            			<th ng-cloak class="text-center">是否显示</th>
+			            		</tr>
+			            	</thead>
+			            	<tbody>
+			            		<tr ng-repeat="userAssess in userAssessList">
+			            			<td ng-cloak class="text-center">{{$index + 1}}</td>
+			            			<td ng-cloak class="text-center">{{userAssess.nick_name}} / {{userAssess.mobile}}</td>
+			            			<td ng-cloak class="text-center">{{userAssess.store_name}} / {{userAssess.room_name}}</td>
+			            			<td ng-cloak class="text-center">{{userAssess.health}} - {{userAssess.av}} -{{userAssess.comfy}}</td>
+									<td ng-cloak class="text-center">{{userAssess.want_film}}</td>
+									<td ng-cloak class="text-left" style="word-break: break-all; word-wrap:break-word;">{{userAssess.create_time | turnDateYMD}}:{{userAssess.info}}</td>
+									<td ng-cloak class="text-left " ng-if="userAssess.reply1" style="word-break: break-all; word-wrap:break-word;">{{userAssess.reply1}}</td>
+									<td ng-cloak class="text-center " ng-if="!userAssess.reply1">
+										<button ng-click="clickReply(userAssess.order_sn,1)">回复</button>
+									</td>
+									<td ng-cloak class="text-left" ng-if="userAssess.add_info" style="word-break: break-all; word-wrap:break-word;">{{userAssess.add_info}}</td>
+									<td ng-cloak class="text-left" ng-if=" userAssess.add_info && userAssess.reply2" style="word-break: break-all; word-wrap:break-word;">{{userAssess.reply2}}</td>
+									<td ng-cloak class="text-center " ng-if="userAssess.add_info && !userAssess.reply2">
+										<button ng-click="clickReply(userAssess.order_sn,2)">回复</button>
+									</td>
+									<td ng-cloak class="text-center" ng-if="!userAssess.add_info" ></td>
+									<td ng-cloak class="text-center" ng-if=" !userAssess.add_info"></td>
+			            			<td ng-cloak class="text-center">
+			            				<label class="i-switch i-switch-md bg-info">
+							              	<input type="checkbox" ng-checked="userAssess.is_show == 1" ng-click="changeuserAssess(userAssess)">
+							              	<i style="margin-right:40px"></i>
+							            </label>
+			            			</td>
+			            		</tr>
+			            	</tbody>
+			            </table>
+			            <div style="position: relative;overflow: hidden">
+							<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+							<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+								<input type="text" ng-model="reqPage" style="width: 36px">
+								<button type="button" ng-click="setPage()" >跳转</button>
+								最大页数: {{maxPage}} 页
+							</div>
+						</div>	
+	   			 	</div>
+  				</div>
+			</div>
+			<div class="userAssessContent2" ng-show="checkMode2 == 'btn btn-default active'">
+				 <div class="panel panel-default">
+	    			<div class="panel-heading font-bold">                  
+						门店评分
+	    			</div>
+	    			<div class="panel-body">
+						<form class="form-inline userAssessForm">
+							<div class="form-group">
+								<select class="form-control" ng-model="storeAssessSn">
+									<option ng-repeat="x in storeListData" value="{{x.store_sn}}" ng-selected="storeAssessSn == x.store_sn">{{x.store_name}}</option>
+								</select>
+							</div>
+
+							<div class="form-group">
+								<button type="submit" class="btn btn-info" ng-click="getStoreAssessBySn()">查询</button>
+								<button type="submit" class="btn btn-info" ng-click="getStoreAssessDocBtn()">导出</button>
+							</div>
+							<!--<div class="form-group">-->
+								<!--<span class="saleTest .p-5">微信支付商户费率: {{settleCharge}}</span>-->
+								<!--<span class="saleTest .p-5">实际营收 = 总营收  X  ( 1 - 费率 )</span>-->
+							<!--</div>-->
+						</form>
+						<table class="table table-responsive table-bordered table-hover userAssessTable">
+			            	<thead>
+								<tr>
+									<th ng-cloak class="text-center" colspan="2">合计</th>
+									<!--<th ng-cloak class="text-center">门店</th>-->
+									<!--<th ng-cloak class="text-center">{{storeAssessData.num}}</th>-->
+									<th ng-cloak class="text-center">{{storeAssessData.count}}</th>
+									<th ng-cloak class="text-center">{{storeAssessData.health}} - {{storeAssessData.av}} - {{storeAssessData.comfy}}</th>
+								</tr>
+			            		<tr>
+			            			<th ng-cloak class="text-center">序号</th>
+			            			<!--<th ng-cloak class="text-center">门店</th>-->
+									<th ng-cloak class="text-center">包间</th>
+			            			<th ng-cloak class="text-center">评论次数</th>
+			            			<th ng-cloak class="text-center">平均(卫生-影音-舒适)</th>
+			            		</tr>
+			            	</thead>
+			            	<tbody>
+			            		<tr ng-repeat="storeAssess in storeAssessList">
+			            			<td ng-cloak class="text-center">{{$index + 1}}</td>
+			            			<!--<td ng-cloak class="text-center">{{storeAssess.store_name}}</td>-->
+									<td ng-cloak class="text-center">{{storeAssess.room_name}}</td>
+			            			<td ng-cloak class="text-center">{{storeAssess.count}}</td>
+			            			<td ng-cloak class="text-center">{{storeAssess.health}} - {{storeAssess.av}} - {{storeAssess.comfy}}</td>
+			            		</tr>
+			            	</tbody>
+			            </table>
+			            <!--<div style="position: relative;overflow: hidden">-->
+							<!--<ul uib-pagination total-items="bigTotalItems2" ng-model="bigCurrentPage2" max-size="maxSize2" items-per-page="perPage" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>-->
+							<!--<div class="pull-left" style="margin-top: 20px;margin-left: 20px">-->
+								<!--<input type="text" ng-model="reqPage2" style="width: 36px">-->
+								<!--<button type="button" ng-click="setPage2()" >跳转</button>-->
+								<!--最大页数: {{maxPage2}} 页-->
+							<!--</div>-->
+						<!--</div>	-->
+	   			 	</div>
+  				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div>
+	<script type="text/ng-template" id="reply.html">
+		<div class="modal-header">
+			<h4 class="modal-title text-center">评论回复
+				<button type="button" class="close" ng-click="close()">
+					<span aria-hidden="true">&times;</span>
+					<span class="sr-only">Close</span>
+				</button>
+			</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" name="replyForm" verify-scope>
+				<div class="form-group">
+					<label for="" class="col-sm-3 control-label">备注:</label>
+					<div class="col-sm-8">
+						<textarea type="text" class="form-control"  ng-verify="min:1, max:140" ng-model="replyInfo" placeholder="请输入不超过140字的回复" style="width: 400px;height: 220px"></textarea>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">关闭</button>
+			<button type="button" class="btn btn-primary" ng-click="clickReply()">提交</button>
+		</div>
+	</script>
+</div>

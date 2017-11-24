@@ -1,0 +1,77 @@
+<div class="navTitle">位置: 电影管理 > 门店电影 > 评价管理</div>
+<div class="showFilmInfo" style="overflow: hidden;">
+	<div>
+		<img src="{{filmInfo.image}}" alt="">
+	</div>
+	<div class="showFilmInfoRight">
+		<div class="font-bold">{{filmInfo.film_name}}</div>
+		<div class="d-flex">
+			<div class="flex-1"><span class="font-bold">类型：</span>{{filmInfo.class_describe}}</div>
+			<div class="flex-1"><span class="font-bold">时长：</span>{{filmInfo.time_length}}</div>
+		</div>
+		<div class="d-flex">
+			<div class="flex-2"><span class="font-bold">导演：</span>{{filmInfo.director}}</div>
+			<div class="flex-2"><span class="font-bold">上映时间：</span>{{filmInfo.screen_time | turnDateYMD}}</div>
+			<div class="flex-4"><span class="font-bold">评分：</span>{{filmInfo.grade}}</div>
+		</div>
+		<div>
+			<div class="infoTitle"><span class="font-bold">剧情介绍：</span></div>
+			<div class="infoDes">
+				{{filmInfo.info}}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="filmCeleBrityList">
+	<div ng-repeat="celebrity in celebrityList">
+		<div>
+			<img src="{{celebrity.image}}" alt="">
+		</div>
+		<div>
+			<p>{{celebrity.name}}</p>
+			<p>
+				<span ng-show="celebrity.type == 2">导演</span>
+				<span ng-show="celebrity.type == 1">演员</span>
+			</p>
+		</div>
+	</div>
+</div>
+<div class="filmReviewsWrap">
+	<p class="filmReviewTitle m-n ">
+		电影评价
+		<button class="btn btn-primary" ng-click="reload()">刷新</button>
+	</p>
+	<div>
+		<div class="pull-left reviewsWrap">
+			<div ng-repeat="reviews in reviewsList">
+				<div class="pull-left userPhoto">
+					<img src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/wxMinApp/userDefPhotoe.png" alt="">
+				</div>
+				<div class="pull-left reviewsBox">
+					<div>{{reviews.nick_name}}</div>
+					<div>{{reviews.grade}}</div>
+					<div>{{reviews.info}}</div>
+					<div>
+						<span>
+						<img src="http://qnbar.oss-cn-hangzhou.aliyuncs.com/ftang/public/wxMinApp/zan.png" alt="" class="up_icon">
+						( {{reviews.praise}} )</span>
+						<span style="margin-left: 40px">{{reviews.create_time | turnDateYMD}}</span>
+					</div>
+				</div>
+				<div class="pull-right filmReviewsBtn">
+					<button class="btn btn-primary btn-lg" ng-show="{{reviews.is_show == 1}}" ng-click="setReviews(reviews,1,$index)">屏蔽</button>
+					<button class="btn btn-primary btn-lg" ng-show="{{reviews.is_show == 0}}" ng-click="setReviews(reviews,0,$index)">显示</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 分页设置 -->
+<div style="position: relative;">
+	<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" items-per-page="perPage" max-size="maxSize" class="pagination-sm pull-left" boundary-link-numbers="true" rotate="false" next-text="下一页" previous-text="上一页" style="margin-left: 40%"></ul>
+	<div class="pull-left" style="margin-top: 20px;margin-left: 20px">
+		<input type="text" ng-model="reqPage" style="width: 36px">
+		<button type="button" ng-click="setPage()" >跳转</button>
+		最大页数: {{maxPage}} 页
+	</div>
+</div>
